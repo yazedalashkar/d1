@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "name": "db1-interactive-academy",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

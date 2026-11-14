@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>أكاديمية قواعد معطيات 1 التفاعلية — جامعة حمص</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap');
+    body {
+      font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;
+      background-color: #0b1120;
+      color: #f1f5f9;
+      overflow-x: hidden;
+    }
+    .mono-ltr {
+      direction: ltr;
+      unicode-bidi: isolate;
+      font-family: 'JetBrains Mono', Consolas, monospace;
+    }
+    .ltr-inline {
+      direction: ltr;
+      unicode-bidi: isolate;
+      display: inline-block;
+      font-family: 'JetBrains Mono', sans-serif;
+      color: #38bdf8;
+      font-weight: 700;
+      background: rgba(56, 189, 248, 0.12);
+      padding: 0 6px;
+      border-radius: 5px;
+      font-size: 0.9em;
+    }
+    .card-glass {
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      backdrop-filter: blur(10px);
+    }
+    .step-active {
+      background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.35);
+    }
+    .step-done {
+      border-color: #10b981;
+      background: rgba(16, 185, 129, 0.12);
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+    .animate-soft {
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
+    ::-webkit-scrollbar { width: 7px; height: 7px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Toast Notification -->
+  <div id="toast-box" class="fixed bottom-5 left-5 z-50 hidden max-w-sm rounded-xl px-4 py-3 shadow-2xl border text-sm font-bold transition-all duration-300"></div>
+
+  <!-- Top Header -->
+  <header class="sticky top-0 z-40 bg-slate-900/95 border-b border-slate-800 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20 font-black text-xl text-white">
+          DB1
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base md:text-lg font-extrabold text-white">أكاديمية قواعد معطيات 1 التفاعلية</h1>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold">جامعة حمص — عملي</span>
+          </div>
+          <p class="text-xs text-slate-400">رحلة تعلم متدرجة من الصفر حتى الاحتراف (المحاضرات 2، 3، 4، 5، 6 — م. بتول ابراهيم)</p>
+        </div>
+      </div>
+
+      <!-- Progress & XP Stats -->
+      <div class="flex items-center gap-3 bg-slate-800/90 border border-slate-700 rounded-xl px-3 py-1.5">
+        <div class="text-xs">
+          <div class="flex items-center justify-between gap-4 mb-1">
+            <span id="rank-badge" class="text-sky-400 font-bold">الرتبة: مبتدئ طموح</span>
+            <span id="progress-text" class="text-slate-300 font-bold">0 / 16 محطة</span>
+          </div>
+          <div class="w-36 md:w-48 h-2 bg-slate-950 rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-gradient-to-r from-emerald-400 to-sky-500 transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="border-r border-slate-700 pr-3 flex items-center gap-1.5">
+          <span class="text-amber-400 text-base">★</span>
+          <div>
+            <div class="text-[10px] text-slate-400 leading-none">نقاط الخبرة</div>
+            <div id="xp-display" class="text-sm font-black text-amber-400">0 XP</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 flex items-center gap-2 overflow-x-auto pb-2 pt-1 border-t border-slate-800/60">
+      <button id="tab-btn-learn" onclick="switchMainTab('learn')" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold whitespace-nowrap transition-all bg-sky-600 text-white shadow">
+        1. رحلة التعلم المتدرج (16 محطة)
+      </button>
+      <button id="tab-btn-sqllab" onclick="switchMainTab('sqllab')" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold whitespace-nowrap transition-all bg-slate-800 text-slate-300 hover:bg-slate-700">
+        2. محاكي ومختبر SQL الحي (24 استعلاماً)
+      </button>
+      <button id="tab-btn-exam" onclick="switchMainTab('exam')" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold whitespace-nowrap transition-all bg-slate-800 text-slate-300 hover:bg-slate-700">
+        3. الفحص التجريبي الشامل (30 سؤالاً)
+      </button>
+      <button id="tab-btn-cheat" onclick="switchMainTab('cheat')" class="px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold whitespace-nowrap transition-all bg-slate-800 text-slate-300 hover:bg-slate-700">
+        4. ملخص النكشات السريع + إعدادات Vercel
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-5">
+
+    <!-- ==================== TAB 1: PROGRESSIVE LEARNING PATH ==================== -->
+    <section id="view-learn" class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+      <!-- Sidebar: 16 Progressive Stations -->
+      <aside class="lg:col-span-4 xl:col-span-3 flex flex-col gap-3">
+        <div class="card-glass rounded-2xl p-3.5">
+          <div class="flex items-center justify-between mb-2.5">
+            <h2 class="text-sm font-extrabold text-white">خارطة المحطات الـ 16</h2>
+            <button onclick="resetAllProgress()" class="text-[11px] text-rose-400 hover:text-rose-300 underline font-semibold">تصفير التقدم</button>
+          </div>
+
+          <!-- Lecture Filter Pills -->
+          <div class="flex flex-wrap gap-1 mb-3">
+            <button onclick="filterSidebar('all')" id="filt-all" class="px-2 py-0.5 rounded text-[11px] font-bold bg-sky-600 text-white">الكل</button>
+            <button onclick="filterSidebar(2)" id="filt-2" class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800 text-slate-300">محاضرة 2</button>
+            <button onclick="filterSidebar(3)" id="filt-3" class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800 text-slate-300">محاضرة 3</button>
+            <button onclick="filterSidebar(4)" id="filt-4" class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800 text-slate-300">محاضرة 4</button>
+            <button onclick="filterSidebar(5)" id="filt-5" class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800 text-slate-300">محاضرة 5</button>
+            <button onclick="filterSidebar(6)" id="filt-6" class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800 text-slate-300">محاضرة 6</button>
+          </div>
+
+          <div id="stations-list" class="space-y-1.5 max-h-[62vh] overflow-y-auto pl-1"></div>
+        </div>
+      </aside>
+
+      <!-- Main Station Stage -->
+      <div class="lg:col-span-8 xl:col-span-9 flex flex-col gap-4">
+        <div id="station-container" class="card-glass rounded-2xl p-5 md:p-6"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: LIVE SQL LAB ==================== -->
+    <section id="view-sqllab" class="hidden space-y-5">
+      <div class="card-glass rounded-2xl p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-extrabold text-white">مختبر ومحاكي استعلامات SQL الحي على قاعدة بيانات COMPANY</h2>
+            <p class="text-xs text-slate-300">اختر أي تمرين من استعلامات المحاضرة 5 أو 6 أو دوال SQL Server، أو اكتب وعدّل الاستعلام بنفسك وشاهد الجدول الناتج فوراً!</p>
+          </div>
+          <div class="flex flex-wrap gap-1.5">
+            <button onclick="filterSqlExercises('all')" id="sql-filt-all" class="px-3 py-1 rounded-lg text-xs font-bold bg-sky-600 text-white">الكل (24)</button>
+            <button onclick="filterSqlExercises('lec5')" id="sql-filt-lec5" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">استعلامات المحاضرة 5 (17)</button>
+            <button onclick="filterSqlExercises('lec6')" id="sql-filt-lec6" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">تجميع ودوال المحاضرة 6 (7)</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+          <!-- Exercise List -->
+          <div class="lg:col-span-5 space-y-2 max-h-[540px] overflow-y-auto pr-1" id="sql-exercise-list"></div>
+
+          <!-- SQL Editor & Output -->
+          <div class="lg:col-span-7 flex flex-col gap-4">
+            <div class="bg-slate-950 border border-slate-700 rounded-xl p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span id="sql-active-title" class="text-sm font-bold text-amber-400">اختر تمريناً من القائمة</span>
+                <div class="flex gap-2">
+                  <button onclick="showSqlSolution()" class="px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold hover:bg-amber-500/30">إظهار الحل النموذجي</button>
+                  <button onclick="runCustomSql()" class="px-3 py-1 rounded bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-500">تنفيذ الاستعلام ▶</button>
+                </div>
+              </div>
+              <textarea id="sql-editor-input" rows="3" class="w-full mono-ltr bg-slate-900 text-emerald-300 border border-slate-700 rounded-lg p-3 text-sm focus:outline-none focus:border-sky-500" placeholder="SELECT * FROM EMPLOYEE"></textarea>
+              <div id="sql-explanation-box" class="mt-2.5 text-xs text-slate-300 bg-slate-900/90 border border-slate-800 rounded-lg p-2.5"></div>
+            </div>
+
+            <!-- Query Result Table -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xs font-bold text-sky-400">الجدول المؤقت الناتج عن تنفيذ تعليمة SELECT:</h3>
+                <span id="sql-row-count" class="text-xs text-slate-400"></span>
+              </div>
+              <div id="sql-result-table" class="overflow-x-auto max-h-64"></div>
+            </div>
+
+            <!-- Reference Tables Previewer -->
+            <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5">
+              <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                <span class="text-xs font-bold text-slate-300">استعراض الجداول الأصلية في قاعدة بيانات COMPANY:</span>
+                <div class="flex flex-wrap gap-1">
+                  <button onclick="previewRefTable('EMPLOYEE')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] mono-ltr text-sky-300">EMPLOYEE</button>
+                  <button onclick="previewRefTable('DEPARTMENT')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] mono-ltr text-sky-300">DEPARTMENT</button>
+                  <button onclick="previewRefTable('PROJECT')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] mono-ltr text-sky-300">PROJECT</button>
+                  <button onclick="previewRefTable('WORKS_ON')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] mono-ltr text-sky-300">WORKS_ON</button>
+                  <button onclick="previewRefTable('DEPENDENT')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] mono-ltr text-sky-300">DEPENDENT</button>
+                  <button onclick="previewRefTable('DEPT_LOCATIONS')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[11px] mono-ltr text-sky-300">DEPT_LOCATIONS</button>
+                </div>
+              </div>
+              <div id="ref-table-container" class="overflow-x-auto max-h-44"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: EXAM SIMULATOR ==================== -->
+    <section id="view-exam" class="hidden space-y-5">
+      <div class="card-glass rounded-2xl p-5">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-lg font-extrabold text-white">محاكي الفحص العملي الشامل (30 سؤالاً من نكشات المحاضرات 2 إلى 6)</h2>
+            <p class="text-xs text-slate-300">اختبر جاهزيتك الكاملة للامتحان مع تصحيح فوري وتعليل مفصل لكل إجابة.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-1.5 text-xs font-bold">
+              النتيجة: <span id="exam-score-label" class="text-emerald-400">0 / 30</span>
+            </div>
+            <button onclick="resetExam()" class="px-3 py-1.5 rounded-xl bg-rose-600/20 text-rose-300 border border-rose-500/30 text-xs font-bold hover:bg-rose-600/30">إعادة الاختبار</button>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-1.5 mb-4">
+          <button onclick="filterExam('all')" id="ex-filt-all" class="px-3 py-1 rounded-lg text-xs font-bold bg-sky-600 text-white">جميع المحاضرات (30)</button>
+          <button onclick="filterExam(2)" id="ex-filt-2" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">المحاضرة 2: ERD</button>
+          <button onclick="filterExam(3)" id="ex-filt-3" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">المحاضرة 3: Mapping</button>
+          <button onclick="filterExam(4)" id="ex-filt-4" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">المحاضرة 4: pgAdmin 4</button>
+          <button onclick="filterExam(5)" id="ex-filt-5" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">المحاضرة 5: SELECT</button>
+          <button onclick="filterExam(6)" id="ex-filt-6" class="px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300">المحاضرة 6: التجميع والدوال</button>
+        </div>
+
+        <div id="exam-questions-container" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: CHEAT SHEET & VERCEL DEPLOYMENT ==================== -->
+    <section id="view-cheat" class="hidden space-y-5">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- Cheat Sheet -->
+        <div class="lg:col-span-7 card-glass rounded-2xl p-5 space-y-3">
+          <h2 class="text-lg font-extrabold text-amber-400">الزبدة الامتحانية: أهم 15 نكشة لا يخلو منها فحص قواعد معطيات 1 عملي</h2>
+          <div class="space-y-2.5 text-xs md:text-sm text-slate-200 leading-relaxed">
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-sky-400">1. الكيان الضعيف (Weak Entity):</strong> يرسم بمستطيل مزدوج وعلاقته التعريفية بمعين مزدوج (<span class="mono-ltr text-amber-300">Identifying Relationship</span>)، ومشاركته فيها <strong>كلية دائماً</strong> (خط مزدوج)، ومفتاحه الجزئي (<span class="mono-ltr text-amber-300">Partial Key</span>) يوضع تحته خط متقطع، وعند التحويل يصبح مفتاحه الأساسي مركباً من (مفتاح المالك + المفتاح الجزئي) مثل <span class="mono-ltr text-emerald-300">(ESSN + DEPENDENT_NAME)</span>.</div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-sky-400">2. أين يوضع المفتاح الأجنبي (FK) في العلاقات؟</strong> في علاقة <span class="mono-ltr text-amber-300">1:1</span> يوضع في الكيان صاحب <strong>المشاركة الكلية (Total Participation)</strong> لتجنب <span class="mono-ltr">NULL</span> (مثل وضع <span class="mono-ltr">MGRSSN</span> داخل <span class="mono-ltr">DEPARTMENT</span>). وفي علاقة <span class="mono-ltr text-amber-300">1:N</span> يوضع دائماً في جهة <span class="mono-ltr text-emerald-300">N</span>. وفي علاقة <span class="mono-ltr text-amber-300">M:N</span> ننشئ <strong>جدولاً وسيطاً جديداً</strong> مفتاحه الأساسي مركب من مفتاحي الكيانين (مثل <span class="mono-ltr">WORKS_ON</span>).</div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-sky-400">3. الصفة المركبة، المشتقة، ومتعددة القيم عند التحويل:</strong> الصفة المركبة (<span class="mono-ltr">Composite</span>) نأخذ مكوناتها البسيطة فقط ونهمل الاسم الأب. الصفة المشتقة (<span class="mono-ltr">Derived</span> - بيضوي منقط) لا تُخزن كعمود. الصفة متعددة القيم (<span class="mono-ltr">Multivalued</span> - بيضوي مزدوج) تتحول إلى <strong>جدول جديد مستقل</strong> مفتاحه الأساسي مركب من <span class="mono-ltr">(K + A)</span> مثل <span class="mono-ltr">DEPT_LOCATIONS(DNUMBER, DLOCATION)</span>.</div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-sky-400">4. لماذا نختار <span class="mono-ltr">character varying(9)</span> للـ SSN بدلاً من <span class="mono-ltr">integer</span>؟</strong> لأنها معرّفات وليست أرقاماً للحساب، وقد تبدأ بصفر على اليسار، ويجب تطابق النوع والطول بين المفتاح الأساسي والمفاتيح الأجنبية المرتبطة به.</div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-sky-400">5. حل الاعتماد الدائري (Circular Reference) وترتيب الإدخال في pgAdmin 4:</strong> ننشئ <span class="mono-ltr">department</span> ونجعل <span class="mono-ltr">mgrssn</span> يقبل <span class="mono-ltr">NULL</span> مؤقتاً وبدون <span class="mono-ltr">FK</span>، ندخل الأقسام بمدير <span class="mono-ltr">[null]</span>، ثم ندخل الموظفين في <span class="mono-ltr">employee</span> بدءاً من المدير الأعلى <span class="mono-ltr">James E Borg</span> (لأن <span class="mono-ltr">superssn</span> له <span class="mono-ltr">[null]</span>) ثم <span class="mono-ltr">Franklin</span> و <span class="mono-ltr">Jennifer</span> ثم الباقين، ثم نحدث <span class="mono-ltr">mgrssn</span> في القسم وننشئ قيد <span class="mono-ltr">FK</span> ونفعّل <span class="mono-ltr">Not NULL</span>.</div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-sky-400">6. أولويات البوابات المنطقية والرموز البديلة في LIKE:</strong> الأولوية هي <span class="mono-ltr text-emerald-300">NOT &rarr; AND &rarr; OR</span>. وفي <span class="mono-ltr">LIKE</span>: الرمز <span class="mono-ltr">%</span> لعدة محارف، <span class="mono-ltr">_</span> لمحرف واحد فقط، <span class="mono-ltr">[a-h]</span> لمجال محارف، و <span class="mono-ltr">^</span> داخل القوسين تعني <span class="mono-ltr">NOT</span> (استثناء).</div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-sky-400">7. قوانين GROUP BY و HAVING وتوابع التجميع:</strong> لا يجوز استخدام الاسم المستعار (<span class="mono-ltr">Alias</span>) في <span class="mono-ltr">GROUP BY</span> (ويجوز في <span class="mono-ltr">ORDER BY</span>). نستخدم <span class="mono-ltr">HAVING</span> للشرط على قيم التجميع. جميع توابع التجميع تتجاهل <span class="mono-ltr">NULL</span> <strong>ما عدا <span class="mono-ltr">COUNT(*)</span></strong>.</div>
+            <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800"><strong class="text-sky-400">8. دوال التاريخ والسلاسل النصية في SQL Server:</strong> <span class="mono-ltr">DATEPART</span> يعيد رقماً بينما <span class="mono-ltr">DATENAME</span> يعيد اسم الجزء نصاً. الترقيم في <span class="mono-ltr">SUBSTRING('abcde', 3, 2)</span> يبدأ من 1 فيعيد <span class="mono-ltr">'cd'</span>. التابع <span class="mono-ltr">ISNULL(address, 0)</span> يعيد <span class="mono-ltr">0</span> إذا كان العنوان <span class="mono-ltr">NULL</span> وإلا يعيد العنوان نفسه.</div>
+          </div>
+        </div>
+
+        <!-- Vercel Ready Config -->
+        <div class="lg:col-span-5 card-glass rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-extrabold text-white">ملفات النشر الجاهزة لـ Vercel و Netlify</h2>
+            <span class="px-2.5 py-0.5 rounded-full text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-bold">Vercel Ready</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            تم تجهيز المشروع بالكامل مع ملفات <span class="mono-ltr text-sky-300">vercel.json</span> و <span class="mono-ltr text-sky-300">package.json</span> و <span class="mono-ltr text-sky-300">index.html</span> داخل الأرشيف المرفوع على حسابك في Google Drive. يمكنك نشره على Vercel بـ 3 طرق سريعة:
+          </p>
+          <ol class="text-xs text-slate-300 space-y-1.5 list-decimal pr-4">
+            <li><strong>عبر GitHub + Vercel:</strong> ارفع ملفات المجلد إلى مستودع GitHub ثم اربطه مع Vercel بضغطة واحدة (Framework Preset: <span class="mono-ltr text-amber-300">Other</span>).</li>
+            <li><strong>عبر أداة Vercel CLI:</strong> فك ضغط الملف وشغّل الأمر <span class="mono-ltr text-emerald-300">npx vercel --prod</span> داخل المجلد.</li>
+            <li><strong>عبر السحب والإفلات (Netlify Drop / Vercel):</strong> اسحب مجلد المشروع مباشرة وسيعمل فوراً.</li>
+          </ol>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-bold mono-ltr text-sky-400">vercel.json</span>
+              <button onclick="copyCodeBlock('vercel-json-code')" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">نسخ الكود</button>
+            </div>
+            <pre id="vercel-json-code" class="mono-ltr text-xs bg-slate-950 border border-slate-800 rounded-xl p-3 text-emerald-300 overflow-x-auto">{
+  "version": 2,
+  "name": "db1-interactive-academy",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}</pre>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-bold mono-ltr text-sky-400">package.json</span>
+              <button onclick="copyCodeBlock('pkg-json-code')" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">نسخ الكود</button>
+            </div>
+            <pre id="pkg-json-code" class="mono-ltr text-xs bg-slate-950 border border-slate-800 rounded-xl p-3 text-amber-300 overflow-x-auto">{
+  "name": "db1-interactive-academy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Interactive Progressive Learning Platform for Databases 1 Practical - Homs University",
+  "scripts": {
+    "start": "npx serve .",
+    "build": "echo 'Static build ready'"
+  }
+}</pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ==================== DATA: 16 PROGRESSIVE STATIONS ====================
+    const STATIONS = [
+      {
+        id: 1,
+        lecture: 2,
+        title: "البداية من الصفر: ما هي الكينونة (Entity) القوية والضعيفة؟",
+        subtitle: "المحاضرة 2 عملي — المكون الأول من مخطط الكينونة-العلاقة (ERD)",
+        intro: "تخيل أنك تصمم نظاماً لشركة (COMPANY). أول سؤال تسأله: عن ماذا نخزن البيانات؟ كل عنصر رئيسي في الواقع (مثل موظف، قسم، مشروع) نسميه كينونة (Entity) ونرسمه على شكل مستطيل!",
+        concepts: [
+          {
+            title: "1. الكيان النظامي / القوي (Regular / Strong Entity)",
+            body: "هو كيان مستقل بذاته لأنه يملك صفة مفتاحية فريدة تميزه لوحده (Primary Key). يرسم في المخطط على شكل <strong class='text-sky-300'>مستطيل مفرد الإطار</strong>. أمثلة من مخطط الشركة: الموظف <span class='ltr-inline'>Employee</span>، القسم <span class='ltr-inline'>Department</span>، المشروع <span class='ltr-inline'>Project</span>."
+          },
+          {
+            title: "2. الكيان الضعيف (Weak Entity) والعلاقة التعريفية",
+            body: "هو كيان لا يستطيع تمييز نفسه بمفرده لأنه لا يملك مفتاحاً أساسياً كافياً، بل يعتمد على كيان آخر يسمى <strong class='text-amber-300'>الكيان المالك (Owner Entity)</strong>. يرسم الكيان الضعيف بـ <strong class='text-amber-300'>مستطيل مزدوج الإطار</strong>، ويرتبط بمالكه عبر <strong class='text-amber-300'>علاقة تعريفية (Identifying Relationship)</strong> ترسم بمعين مزدوج! مثال: التابع <span class='ltr-inline'>Dependent</span> (ابن أو زوجة الموظف)."
+          }
+        ],
+        visualType: "entity_compare",
+        trap: "انتبه في الفحص: مشاركة الكيان الضعيف (Weak Entity) في علاقته التعريفية مع الكيان المالك تكون مشاركة كلية دائماً (Total Participation — خط مزدوج) لأنه لا يمكن وجود تابع في النظام بدون موظف يتبع له!",
+        quizzes: [
+          {
+            q: "أي من الكيانات التالية في مخطط الشركة (COMPANY) يُصنّف ككيان ضعيف (Weak Entity) ويرسم بمستطيل مزدوج؟",
+            options: ["Project (المشروع)", "Department (القسم)", "Dependent (التابع / فرد عائلة الموظف)", "Employee (الموظف)"],
+            ans: 2,
+            exp: "أحسنت! Dependent هو الكيان الضعيف الوحيد في مخطط الشركة لأنه يعتمد وجودياً على الموظف (Employee)."
+          },
+          {
+            q: "بماذا نرسم العلاقة التعريفية (Identifying Relationship) التي تربط الكيان الضعيف بالكيان المالك؟",
+            options: ["معين مفرد الإطار", "معين مزدوج الإطار", "شكل بيضوي مزدوج", "مستطيل متقطع"],
+            ans: 1,
+            exp: "صحيح! الكيان الضعيف مستطيل مزدوج، وعلاقته التعريفية (مثل Dependents-OF) معين مزدوج."
+          }
+        ]
+      },
+      {
+        id: 2,
+        lecture: 2,
+        title: "أنواع الصفات الـ 6 (Attributes) والمفاتيح في ERD",
+        subtitle: "المحاضرة 2 عملي — كيف نصف خصائص الكيانات ونميزها بالرسم؟",
+        intro: "بعد أن رسمنا الكيانات كمستطيلات، نحتاج لوصف بياناتها (مثل الاسم، الرقم، الراتب، المواقع). كل خاصية نسميها صفة (Attribute) ونرسمها بشكل بيضوي، لكن شكل البيضوي يتغير حسب نوع الصفة!",
+        concepts: [
+          {
+            title: "1. الصفة البسيطة (Simple) والمركبة (Composite)",
+            body: "<strong>البسيطة (Simple Attribute):</strong> بيضوي مفرد عادي لا يتجزأ (مثل الجنس <span class='ltr-inline'>Sex</span> والراتب <span class='ltr-inline'>Salary</span>).<br><strong>المركبة (Composite Attribute):</strong> بيضوي يتفرع منه عدة أشكال بيضوية أصغر، مثل الاسم الثلاثي <span class='ltr-inline'>Name</span> المتفرع إلى <span class='ltr-inline'>(FName, Minit, LName)</span>."
+          },
+          {
+            title: "2. الصفة المفتاحية (Key Attribute) والمفتاح الجزئي (Partial Key)",
+            body: "<strong>المفتاح الأساسي (Key Attribute):</strong> بيضوي تحته <strong>خط متصل</strong> لا تتكرر قيمته أبداً (مثل <span class='ltr-inline'>SSN</span> للموظف، و <span class='ltr-inline'>Number</span> و <span class='ltr-inline'>Name</span> للقسم).<br><strong>المفتاح الجزئي (Partial Key):</strong> بيضوي تحته <strong>خط متقطع/منقط</strong> يوضع داخل الكيان الضعيف فقط (مثل <span class='ltr-inline'>Name</span> للتابع <span class='ltr-inline'>Dependent</span>)."
+          },
+          {
+            title: "3. متعددة القيم (Multivalued) والمشتقة (Derived)",
+            body: "<strong>متعددة القيم (Multivalued):</strong> <strong>بيضوي مزدوج</strong> لأنها تقبل عدة قيم لنفس السجل (مثل مواقع القسم <span class='ltr-inline'>Location</span>، أو هاتف الموظف: أرضي وموبايل).<br><strong>المشتقة (Derived):</strong> <strong>بيضوي متقطع (منقط)</strong> لأنها تُحسب ولا تُخزن (مثل عدد موظفي القسم <span class='ltr-inline'>Number-of-employees</span>)."
+          }
+        ],
+        visualType: "attribute_explorer",
+        trap: "نكشة مقارنة دقيقة في مخطط الشركة: صفة الموقع (Location) في كيان القسم (Department) هي صفة متعددة القيم (بيضوي مزدوج لأن للقسم عدة مواقع)، بينما صفة الموقع (Location) في كيان المشروع (Project) هي صفة بسيطة مفردة (لأن للمشروع موقعاً واحداً فقط)!",
+        quizzes: [
+          {
+            q: "كيف نرسم صفة 'عدد الموظفين في القسم' (Number-of-employees) في مخطط ERD؟",
+            options: ["بيضوي مزدوج (Multivalued Attribute)", "بيضوي بإطار متقطع/منقط (Derived Attribute)", "بيضوي تحته خط متصل (Key Attribute)", "معين مفرد"],
+            ans: 1,
+            exp: "ممتاز! لأن عدد الموظفين يُحسب تلقائياً من عدد الموظفين المرتبطين بالقسم، فهو صفة مشتقة (Derived Attribute) ترسم ببيضوي منقط."
+          },
+          {
+            q: "إذا ورد في نص المسألة: 'رقم الهاتف للموظف /أرضي وموبايل/'، فما نوع صفة رقم الهاتف؟",
+            options: ["صفة مشتقة (Derived)", "صفة مفتاحية (Key Attribute)", "صفة متعددة القيم (Multivalued Attribute) ببيضوي مزدوج", "كيان ضعيف"],
+            ans: 2,
+            exp: "بالضبط! لأن الموظف الواحد يمكن أن يملك أكثر من رقم هاتف في نفس الوقت، فترسم ببيضوي مزدوج (أو مركبة/متعددة)."
+          }
+        ]
+      },
+      {
+        id: 3,
+        lecture: 2,
+        title: "العلاقات والقيود: التعددية (Cardinality) والمشاركة (Participation)",
+        subtitle: "المحاضرة 2 عملي — كيف نضبط قوانين الارتباط بين الكيانات؟",
+        intro: "المعين يربط بين الكيانات، ولكن كيف نعرف هل الموظف يعمل في قسم واحد أم عدة أقسام؟ وهل يجب أن يعمل كل موظف في قسم أم لا؟ هنا يأتي دور القيود على العلاقات!",
+        concepts: [
+          {
+            title: "1. نسبة التعددية (Cardinality Ratio) — (1:1 , 1:N , M:N)",
+            body: "تحدد الحد الأقصى للارتباطات:<br>&bull; <span class='ltr-inline'>1 : 1</span> مثل علاقة الإدارة <span class='ltr-inline'>Manage</span> (المدير يدير قسماً واحداً، والقسم يديره مدير واحد).<br>&bull; <span class='ltr-inline'>1 : N</span> مثل علاقة العمل <span class='ltr-inline'>Works-For</span> (القسم 1 يعمل فيه N موظفين).<br>&bull; <span class='ltr-inline'>M : N</span> مثل علاقة <span class='ltr-inline'>Works-on</span> (الموظف يعمل على عدة مشاريع، والمشروع يعمل عليه عدة موظفين)."
+          },
+          {
+            title: "2. قيد المشاركة (Participation): كلية (Total) أم جزئية (Partial)؟",
+            body: "&bull; <strong>مشاركة كلية (Total Participation — خط مزدوج):</strong> كل عنصر في الكيان <strong>مجبَر</strong> على المشاركة في العلاقة (مثال: كل قسم يجب أن يكون له مدير، فخط القسم مع <span class='ltr-inline'>Manage</span> مزدوج).<br>&bull; <strong>مشاركة جزئية (Partial Participation — خط مفرد):</strong> المشاركة اختيارية لبعض العناصر (مثال: ليس كل موظف هو مدير قسم، فخط الموظف مع <span class='ltr-inline'>Manage</span> مفرد)."
+          },
+          {
+            title: "3. القيد الهيكلي البديل (Structural Constraint: (min, max))",
+            body: "يكتب على الخط بصيغة <span class='ltr-inline'>(الأدنى, الأعلى)</span>: إذا كان <span class='ltr-inline'>min = 0</span> فالمشاركة جزئية، وإذا كان <span class='ltr-inline'>min &ge; 1</span> فالمشاركة كلية إلزامية!"
+          }
+        ],
+        visualType: "relationship_sim",
+        trap: "نكشة الصفات على العلاقات: أين نضع صفة 'عدد الساعات (Hours)' وصفة 'تاريخ استلام الإدارة (Start-Work)'؟ لا نضع Hours داخل الموظف ولا داخل المشروع، بل نعلقها على معين العلاقة Works-on (M:N) لأنها تخص عمل موظف معين في مشروع معين! ونضع Start-Work على معين علاقة Manage (1:1).",
+        quizzes: [
+          {
+            q: "في علاقة الإشراف على المشاريع (Control) بين القسم (Department) والمشروع (Project): 'يمكن للقسم أن يشرف على مشروع أو أكثر، ولكن المشروع يجب أن يشرف عليه قسم واحد فقط'. ما نوع الخطين؟",
+            options: ["خط مزدوج من جهة القسم، وخط مفرد من جهة المشروع", "خط مفرد (جزئية) من جهة القسم، وخط مزدوج (كلية) من جهة المشروع", "خط مفرد من الجهتين", "خط مزدوج من الجهتين"],
+            ans: 1,
+            exp: "رائع! كلمة 'يمكن للقسم' تعني مشاركة جزئية (خط مفرد)، وكلمة 'المشروع يجب أن يشرف عليه' تعني مشاركة كلية (خط مزدوج)."
+          },
+          {
+            q: "ما اسم العلاقة التي يرتبط فيها كيان الموظف (Employee) مع نفسه لأنه يشرف على موظفين آخرين؟",
+            options: ["علاقة تعريفية مزدوجة", "علاقة أحادية / ذاتية (Recursive Relationship - Supervision)", "علاقة M:N", "صفة مشتقة"],
+            ans: 1,
+            exp: "صحيح! علاقة Supervision هي علاقة ذاتية (1:N) يلعب فيها Employee دورين: دور المشرف Supervisor (1) ودور المرؤوس Supervise (N)."
+          }
+        ]
+      },
+      {
+        id: 4,
+        lecture: 2,
+        title: "تطبيق شامل: مخطط الشركة (COMPANY) + حل وظيفة السكن الجامعي",
+        subtitle: "المحاضرة 2 عملي — قراءة المخطط الكامل وحل مسألة الوظيفة صفحة 5",
+        intro: "الآن نجمع كل ما تعلمناه في المحطات الثلاث السابقة لنقرأ مخطط الشركة (COMPANY) بالكامل، ونحل مسألة الوظيفة (مدينة السكن الجامعي) خطوة بخطوة لتضمن علامتها لو جاءت في الامتحان!",
+        concepts: [
+          {
+            title: "1. ملخص مخطط الشركة (COMPANY ERD)",
+            body: "يضم <strong>4 كيانات</strong> (3 قوية: <span class='ltr-inline'>Employee, Department, Project</span> + 1 ضعيف: <span class='ltr-inline'>Dependent</span>) و<strong>6 علاقات</strong>: <span class='ltr-inline'>Works-For (1:N)</span>، <span class='ltr-inline'>Manage (1:1)</span> مع صفة <span class='ltr-inline'>Start-Work</span>، <span class='ltr-inline'>Supervision (1:N ذاتية)</span>، <span class='ltr-inline'>Control (1:N)</span>، <span class='ltr-inline'>Works-on (M:N)</span> مع صفة <span class='ltr-inline'>Hours</span>، و <span class='ltr-inline'>Dependents-OF (1:N تعريفية)</span>."
+          },
+          {
+            title: "2. الحل الكامل لوظيفة المحاضرة الثانية (مدينة السكن الجامعي)",
+            body: "&bull; <strong>الكيانات:</strong> الطالب <span class='ltr-inline'>Student</span> (رقم، اسم، تاريخ ولادة، عنوان، اختصاص)، الموظف <span class='ltr-inline'>Employee</span> (رقم تأمين PK، اسم، مؤهل، توصيف، تاريخ بدء، وهاتف متعدد القيم)، المبنى <span class='ltr-inline'>Building</span> (رقم المبنى PK، عدد الغرف، عدد الطوابق)، النشاط <span class='ltr-inline'>Activity</span> (رقم PK، اسم، رسم، وقت)، والقسط الشهري <span class='ltr-inline'>Installment</span> (كيان ضعيف مرتبط بالطالب: رقم القسط، قيمة، شهر، سنة).<br>&bull; <strong>العلاقات:</strong> المهندس يصون المبنى <span class='ltr-inline'>(1:N)</span>، الطالب يقيم في المبنى <span class='ltr-inline'>(1:N)</span> مع صفة رقم الغرفة، الطالب يسدد الأقساط <span class='ltr-inline'>(1:N)</span>، والطالب يشارك في الأنشطة <span class='ltr-inline'>(M:N)</span>."
+          }
+        ],
+        visualType: "company_and_hw_tabs",
+        trap: "انتبه في مسألة السكن الجامعي: 'مهندس الصيانة يمكن أن يشرف على صيانة أكثر من مبنى بينما لا يكون للمبنى غير مهندس صيانة وحيد' -> إذن العلاقة (1:N) حيث المهندس جهة (1) بمشاركة جزئية (لأنه أحد الموظفين)، والمبنى جهة (N) بمشاركة كلية!",
+        quizzes: [
+          {
+            q: "في مسألة مدينة السكن الجامعي: 'يمكن للطالب الاشتراك بأكثر من نشاط والنشاط قد يضم عدداً من الطلاب'. ما نوع العلاقة بين الطالب والنشاط؟",
+            options: ["1 : 1", "1 : N من جهة الطالب", "M : N (متعدد لمتعدد)", "علاقة ذاتية"],
+            ans: 2,
+            exp: "ممتاز! كلا الطرفين متعدد، لذلك هي علاقة M:N وستتحول عند الـ Mapping إلى جدول وسيط."
+          },
+          {
+            q: "كم عدد الكيانات وكم عدد العلاقات في مخطط ERD للشركة (COMPANY)؟",
+            options: ["6 كيانات و 4 علاقات", "4 كيانات (3 قوية و1 ضعيف) و 6 علاقات", "5 كيانات و 5 علاقات", "3 كيانات و 8 علاقات"],
+            ans: 1,
+            exp: "دقيق جداً! في مخطط ERD للشركة لدينا 4 كيانات فقط، وعند تحويلها لـ Schema في المحاضرة الثالثة ستصبح 6 جداول!"
+          }
+        ]
+      },
+      {
+        id: 5,
+        lecture: 3,
+        title: "خوارزمية التحويل (Mapping): الخطوة 1 والخطوة 2",
+        subtitle: "المحاضرة 3 عملي — كيف نحول الكيانات القوية والضعيفة إلى جداول؟",
+        intro: "انتهينا من الرسم! الآن كيف نحول مخطط ERD إلى جداول حقيقية (Relational Schema)؟ نطبق خوارزمية التحويل المكونة من 6 خطوات. نبدأ في هذه المحطة بالخطوتين 1 و 2!",
+        concepts: [
+          {
+            title: "الخطوة 1: تحويل الكيانات القوية (Mapping of Regular Entity Types)",
+            body: "لكل كيان قوي <span class='ltr-inline'>E</span> ننشئ علاقة (جدول) <span class='ltr-inline'>R</span> ونضع فيها <strong>جميع الصفات البسيطة فقط</strong>. إذا كان لدينا صفة مركبة (مثل <span class='ltr-inline'>Name</span>) ندرج <strong>مكوناتها البسيطة فقط</strong> (<span class='ltr-inline'>FNAME, MINIT, LNAME</span>) ونهمل اسم الصفة المركبة! ونختار إحدى الصفات المفتاحية لتكون <span class='ltr-inline'>Primary Key</span> (وإن كان المفتاح مركباً، فإن صفاته البسيطة معاً تشكل الـ <span class='ltr-inline'>PK</span>)."
+          },
+          {
+            title: "الخطوة 2: تحويل الكيانات الضعيفة (Mapping of Weak Entity Types)",
+            body: "لكل كيان ضعيف <span class='ltr-inline'>W</span> يتبع لكيان مالك <span class='ltr-inline'>E</span>:<br>1) ننشئ جدولاً <span class='ltr-inline'>R</span> يضم جميع الصفات البسيطة لـ <span class='ltr-inline'>W</span>.<br>2) ندرج في <span class='ltr-inline'>R</span> كمفتاح أجنبي (<span class='ltr-inline'>Foreign Key</span>) المفتاح الأساسي للكيان المالك <span class='ltr-inline'>E</span>.<br>3) يكون المفتاح الأساسي لـ <span class='ltr-inline'>R</span> هو <strong>تركيب (مفتاح الكيان المالك FK + المفتاح الجزئي Partial Key للكيان الضعيف)</strong>."
+          }
+        ],
+        visualType: "mapping_step1_2",
+        trap: "نكشة DEPENDENT: لماذا المفتاح الأساسي لجدول DEPENDENT هو (ESSN + DEPENDENT_NAME) معاً وليس DEPENDENT_NAME وحده؟ لأن موظفين مختلفين قد يكون لكل منهما ابنة اسمها Alice! فتركيب رقم الموظف ESSN مع اسم التابع يضمن عدم التكرار.",
+        quizzes: [
+          {
+            q: "عند تطبيق الخطوة 1 على كيان Employee الذي يحوي الصفة المركبة Name(FName, Minit, LName)، ماذا يظهر كأعمدة في جدول EMPLOYEE؟",
+            options: ["عمود واحد فقط اسمه Name", "ثلاثة أعمدة: FNAME, MINIT, LNAME فقط دون عمود Name", "أربعة أعمدة: Name, FNAME, MINIT, LNAME", "جدول منفصل للاسم"],
+            ans: 1,
+            exp: "أحسنت! في النموذج العلائقي لا توجد صفات مركبة، فنأخذ المكونات البسيطة فقط (FNAME, MINIT, LNAME)."
+          },
+          {
+            q: "ما هو المفتاح الأساسي (Primary Key) لجدول الكيان الضعيف DEPENDENT بعد تطبيق الخطوة 2؟",
+            options: ["DEPENDENT_NAME فقط", "ESSN فقط", "مفتاح مركب من (ESSN, DEPENDENT_NAME) معاً", "RELATIONSHIP"],
+            ans: 2,
+            exp: "ممتاز! الخطوة 2 تنص على أن المفتاح الأساسي للكيان الضعيف هو تركيب مفتاح المالك (ESSN) مع المفتاح الجزئي (DEPENDENT_NAME)."
+          }
+        ]
+      },
+      {
+        id: 6,
+        lecture: 3,
+        title: "خوارزمية التحويل (Mapping): الخطوة 3 (1:1) والخطوة 4 (1:N)",
+        subtitle: "المحاضرة 3 عملي — القاعدة الذهبية لحركة المفتاح الأجنبي (Foreign Key)",
+        intro: "العلاقات الثنائية 1:1 و 1:N لا تحتاج إلى إنشاء جدول جديد! بل نحلّها عن طريق استعارة مفتاح أساسي من جدول ووضعه كمفتاح أجنبي (Foreign Key) في الجدول الآخر. لكن من يأخذ مفتاح من؟",
+        concepts: [
+          {
+            title: "الخطوة 3: تحويل علاقة 1:1 (Mapping of Binary 1:1)",
+            body: "نتبع أسلوب المفتاح الأجنبي (<span class='ltr-inline'>Foreign Key Approach</span>): نختار إحدى العلاقتين لتكن <span class='ltr-inline'>S</span>، وندرج فيها المفتاح الأساسي للعلاقة الأخرى <span class='ltr-inline'>T</span> كمفتاح أجنبي + أي صفات تخص العلاقة.<br><strong class='text-amber-300'>من نختار ليكون S؟</strong> نختار دائماً الكيان الذي يملك <strong>مشاركة كلية (Total Participation — خط مزدوج)</strong> ليكون <span class='ltr-inline'>S</span>! لذلك في علاقة <span class='ltr-inline'>Manage</span> نضع <span class='ltr-inline'>MGRSSN</span> و <span class='ltr-inline'>MGRSTARTDATE</span> داخل جدول <span class='ltr-inline'>DEPARTMENT</span>!"
+          },
+          {
+            title: "الخطوة 4: تحويل علاقة 1:N (Mapping of Binary 1:N)",
+            body: "القاعدة الثابتة: لتكن <span class='ltr-inline'>S</span> هي الكيان في <strong>جهة N (المتعدد)</strong>، و <span class='ltr-inline'>T</span> في <strong>جهة 1 (الواحد)</strong>. نأخذ المفتاح الأساسي لجهة <span class='ltr-inline'>1 (T)</span> ونضعه كمفتاح أجنبي داخل جدول جهة <span class='ltr-inline'>N (S)</span> مع أي صفات بسيطة للعلاقة!<br>أمثلة في الشركة: 1) <span class='ltr-inline'>EMPLOYEE.DNO</span> من علاقة العمل، 2) <span class='ltr-inline'>PROJECT.DNUM</span> من علاقة الإشراف، 3) <span class='ltr-inline'>EMPLOYEE.SUPERSSN</span> من علاقة الإشراف الذاتي!"
+          }
+        ],
+        visualType: "mapping_step3_4",
+        trap: "احفظها بهذه الجملة: في 1:1 المفتاح الأجنبي يذهب لصاحب الخطين (المشاركة الكلية)، وفي 1:N المفتاح الأجنبي يذهب دائماً لجهة الـ N ('الواحد يزور المتعدد')!",
+        quizzes: [
+          {
+            q: "لماذا وضعنا المفتاح الأجنبي MGRSSN وصفة MGRSTARTDATE في جدول DEPARTMENT وليس في جدول EMPLOYEE عند تحويل علاقة Manage (1:1)؟",
+            options: ["لأن DEPARTMENT هو الكيان الأكبر حجماً", "لأن DEPARTMENT يملك مشاركة كلية (Total Participation) في علاقة الإدارة، فنتجنب ظهور قيم NULL لمعظم الموظفين", "لأن EMPLOYEE كيان ضعيف", "لأن العلاقة 1:N"],
+            ans: 1,
+            exp: "إجابة احترافية! لو وضعنا رقم القسم المدار داخل جدول الموظفين لظهرت قيمة NULL عند كل الموظفين غير المدراء، بينما كل قسم له مدير حتماً."
+          },
+          {
+            q: "عند تحويل علاقة Control (1:N) حيث القسم (1) يشرف على عدة مشاريع (N)، أين يوضع المفتاح الأجنبي؟",
+            options: ["نضع رقم المشروع PNUMBER داخل جدول DEPARTMENT", "نضع رقم القسم DNUM داخل جدول PROJECT (جهة N)", "ننشئ جدولاً ثالثاً جديداً", "لا نضع أي مفتاح أجنبي"],
+            ans: 1,
+            exp: "صحيح! المشروع هو جهة N، لذلك يأخذ المفتاح الأساسي للقسم (ويسمى DNUM في جدول PROJECT)."
+          }
+        ]
+      },
+      {
+        id: 7,
+        lecture: 3,
+        title: "خوارزمية التحويل (Mapping): الخطوة 5 (M:N) والخطوة 6 (متعددة القيم)",
+        subtitle: "المحاضرة 3 عملي — متى نضطر لإنشاء جدول جديد كلياً؟",
+        intro: "في مخطط ERD للشركة كان لدينا 4 كيانات فقط، لكن المخطط العلائقي الناتج فيه 6 جداول! من أين جاء الجدولان الإضافيان؟ جاءا من الخطوة 5 والخطوة 6!",
+        concepts: [
+          {
+            title: "الخطوة 5: تحويل علاقات M:N (Mapping of Binary M:N)",
+            body: "في علاقة <span class='ltr-inline'>M:N</span> يستحيل وضع مفتاح أجنبي في أحد الجدولين دون تكرار. لذلك:<br>1) <strong>ننشئ علاقة (جدولاً وسيطاً) جديدة <span class='ltr-inline'>S</span></strong>.<br>2) ندرج في <span class='ltr-inline'>S</span> كمفاتيح أجنبية المفاتيح الأساسية للكيانات المشاركة.<br>3) يشكل <strong>اجتماع هذه المفاتيح معاً المفتاح الأساسي المركب (Composite PK)</strong> للجدول <span class='ltr-inline'>S</span>، ونضيف فيه أي صفات بسيطة للعلاقة.<br>&bull; تطبيق: علاقة <span class='ltr-inline'>Works-on</span> تصبح جدول <span class='ltr-inline'>WORKS_ON(<u>ESSN, PNO</u>, HOURS)</span>."
+          },
+          {
+            title: "الخطوة 6: تحويل الصفات متعددة القيم (Mapping of Multivalued Attributes)",
+            body: "لكل صفة متعددة القيم <span class='ltr-inline'>A</span> (بيضوي مزدوج):<br>1) <strong>ننشئ علاقة (جدولاً) جديدة <span class='ltr-inline'>R</span></strong>.<br>2) نضع فيها الصفة <span class='ltr-inline'>A</span> (أو مكوناتها البسيطة إن كانت مركبة) + المفتاح الأساسي <span class='ltr-inline'>K</span> للكيان الذي يملكها كمفتاح أجنبي.<br>3) يكون <strong>المفتاح الأساسي لـ <span class='ltr-inline'>R</span> هو تركيب <span class='ltr'>(A + K)</span> معاً</strong>!<br>&bull; تطبيق: مواقع القسم تصبح جدول <span class='ltr-inline'>DEPT_LOCATIONS(<u>DNUMBER, DLOCATION</u>)</span>."
+          }
+        ],
+        visualType: "mapping_step5_6",
+        trap: "انتبه: في جدول WORKS_ON، العمود HOURS (عدد الساعات) هو صفة عادية وليست جزءاً من المفتاح الأساسي! المفتاح الأساسي المركب هو (ESSN + PNO) فقط. أما في جدول DEPT_LOCATIONS فكلا العمودين (DNUMBER + DLOCATION) يشكلان معاً المفتاح الأساسي المركب!",
+        quizzes: [
+          {
+            q: "ما هو المفتاح الأساسي لجدول الرغبات/المواقع الناتج عن تحويل صفة متعددة القيم A يملكها كيان مفتاحه الأساسي K؟",
+            options: ["K وحده", "A وحده", "تركيب (A و K) معاً، مع كون K مفتاحاً أجنبياً يشير للكيان المالك", "لا يوجد له مفتاح أساسي"],
+            ans: 2,
+            exp: "ممتاز! تركيب (A و K) معاً يمنع تكرار نفس الموقع لنفس القسم، ويسمح للقسم الواحد بامتلاك عدة مواقع في عدة صفوف."
+          },
+          {
+            q: "في مسألة وظيفة السكن الجامعي، الطالب يشارك في عدة أنشطة والنشاط يضم عدة طلاب (M:N). كيف تتحول هذه العلاقة؟",
+            options: ["نضع رقم النشاط داخل جدول الطالب", "نضع رقم الطالب داخل جدول النشاط", "ننشئ جدولاً جديداً يضم (رقم_الطالب، رقم_النشاط) كمفاتيح أجنبية واجتماعهما معاً هو المفتاح الأساسي المركب", "نحذف العلاقة"],
+            ans: 2,
+            exp: "بالضبط! أي علاقة M:N تتحول فوراً حسب الخطوة 5 إلى جدول جديد مفتاحه الأساسي مركب من مفتاحي الطرفين."
+          }
+        ]
+      },
+      {
+        id: 8,
+        lecture: 3,
+        title: "المخطط العلائقي النهائي (Relational Schema) والأسهم الـ 8",
+        subtitle: "المحاضرة 3 عملي (صفحة 4) + المحاضرة 4 عملي (صفحة 17)",
+        intro: "انظر الآن إلى الصورة الكاملة: 6 جداول و 8 أسهم تمثل العلاقات (Foreign Keys). فهمك لاتجاه كل سهم في هذا المخطط يضمن لك الإجابة عن أي سؤال في المحاضرتين 3 و 4!",
+        concepts: [
+          {
+            title: "الجداول الثلاثة ذات المفتاح المفرد والجداول الثلاثة ذات المفتاح المركب",
+            body: "&bull; <strong>مفتاح أساسي مفرد (عمود واحد):</strong> <span class='ltr-inline'>EMPLOYEE (<u>SSN</u>)</span>، <span class='ltr-inline'>DEPARTMENT (<u>DNUMBER</u>)</span>، <span class='ltr-inline'>PROJECT (<u>PNUMBER</u>)</span>.<br>&bull; <strong>مفتاح أساسي مركب (عمودان معاً):</strong> <span class='ltr-inline'>DEPT_LOCATIONS (<u>DNUMBER, DLOCATION</u>)</span>، <span class='ltr-inline'>WORKS_ON (<u>ESSN, PNO</u>)</span>، <span class='ltr-inline'>DEPENDENT (<u>ESSN, DEPENDENT_NAME</u>)</span>."
+          },
+          {
+            title: "الأسهم الـ 8 (من الجدول الابن Foreign Key إلى الجدول الأب Primary Key)",
+            body: "1) <span class='ltr-inline'>employee.dno &rarr; department.dnumber</span><br>2) <span class='ltr-inline'>employee.superssn &rarr; employee.ssn</span> (سهم ذاتي لنفس الجدول!)<br>3) <span class='ltr-inline'>department.mgrssn &rarr; employee.ssn</span><br>4) <span class='ltr-inline'>dept_locations.dnumber &rarr; department.dnumber</span><br>5) <span class='ltr-inline'>project.dnum &rarr; department.dnumber</span><br>6) <span class='ltr-inline'>works_on.essn &rarr; employee.ssn</span><br>7) <span class='ltr-inline'>works_on.pno &rarr; project.pnumber</span><br>8) <span class='ltr-inline'>dependent.essn &rarr; employee.ssn</span>"
+          }
+        ],
+        visualType: "schema_interactive",
+        trap: "نكشة اتجاه السهم: السهم لا يخرج من المفتاح الأساسي! السهم ينطلق دائماً من ذيل المفتاح الأجنبي (Local Column في الجدول الابن) ويشير برأسه إلى المفتاح الأساسي (Referenced Column في الجدول الأب).",
+        quizzes: [
+          {
+            q: "كم عدد المفاتيح الأجنبية (Foreign Keys) الإجمالي في مخطط قاعدة بيانات الشركة COMPANY؟",
+            options: ["4 مفاتيح أجنبية", "6 مفاتيح أجنبية", "8 مفاتيح أجنبية", "10 مفاتيح أجنبية"],
+            ans: 2,
+            exp: "أحسنت! 2 في employee، و1 في department، و1 في dept_locations، و1 في project، و2 في works_on، و1 في dependent = 8 مفاتيح أجنبية."
+          },
+          {
+            q: "إلى ماذا يشير السهم الخارج من العمود SUPERSSN في جدول EMPLOYEE؟",
+            options: ["إلى DNUMBER في جدول DEPARTMENT", "إلى PNUMBER في جدول PROJECT", "إلى العمود SSN في نفس جدول EMPLOYEE (علاقة إشراف ذاتي)", "إلى ESSN في جدول DEPENDENT"],
+            ans: 2,
+            exp: "صحيح! لأن المشرف هو موظف أيضاً، فيشير SUPERSSN إلى SSN داخل جدول EMPLOYEE نفسه."
+          }
+        ]
+      },
+      {
+        id: 9,
+        lecture: 4,
+        title: "الانتقال إلى PostgreSQL و pgAdmin 4: تحويل أنماط البيانات",
+        subtitle: "المحاضرة 4 عملي (صفحة 1 إلى 5) — كيف نختار Data Types الصحيحة؟",
+        intro: "في المحاضرة الرابعة نطبق قاعدة بيانات COMPANY عملياً على PostgreSQL باستخدام واجهة pgAdmin 4. أول خطوة هي معرفة كيف تختلف أسماء أنماط البيانات في PostgreSQL عن SQL Server!",
+        concepts: [
+          {
+            title: "1. جدول التحويل الذهبي لأنماط البيانات (SQL Server &rarr; PostgreSQL)",
+            body: "&bull; <span class='ltr-inline'>int</span> &rarr; نختار <span class='ltr-inline'>integer</span> (للأرقام: <span class='ltr-inline'>dnumber, pnumber, dno, dnum, pno</span>).<br>&bull; <span class='ltr-inline'>varchar(30)</span> &rarr; نختار <span class='ltr-inline'>character varying</span> مع ضبط <span class='ltr-inline'>Length/Precision = 30</span>.<br>&bull; <span class='ltr-inline'>char(1)</span> &rarr; نختار <span class='ltr-inline'>character</span> مع <span class='ltr-inline'>Length = 1</span> (لـ <span class='ltr-inline'>minit, sex</span>).<br>&bull; <span class='ltr-inline'>decimal(p,s)</span> &rarr; نختار <span class='ltr-inline'>numeric</span> مع <span class='ltr-inline'>Precision = p, Scale = s</span> (مثل <span class='ltr-inline'>salary numeric(10,2)</span> و <span class='ltr-inline'>hours numeric(4,1)</span>).<br>&bull; <span class='ltr-inline'>datetime</span> &rarr; <span class='ltr-inline'>timestamp without time zone</span> | <span class='ltr-inline'>bit</span> &rarr; <span class='ltr-inline'>boolean</span>."
+          },
+          {
+            title: "2. لماذا SSN و MGRSSN و SUPERSSN و ESSN نوعها character varying(9)؟",
+            body: "لأنها <strong>معرّفات (Identifiers) وليست أرقاماً للحساب</strong>، وقد تبدأ بصفر على اليسار (النوع <span class='ltr-inline'>integer</span> يحذف الأصفار اليسارية!). ويجب أن يتطابق النوع والطول في المفتاح الأساسي وجميع المفاتيح الأجنبية المرتبطة به."
+          }
+        ],
+        visualType: "datatype_matcher",
+        trap: "نكشتان في PostgreSQL: 1) يدعم PostgreSQL ترميز Unicode مباشرة لذلك لا نحتاج للبادئة N (الموجودة في nvarchar/nchar). 2) يحول PostgreSQL أسماء الجداول والأعمدة غير الموضوعة بين علامتي اقتباس إلى أحرف صغيرة (lowercase) تلقائياً.",
+        quizzes: [
+          {
+            q: "ما هو الاسم الرسمي الموافق للنوع varchar(30) داخل قائمة Data type في برنامج pgAdmin 4؟",
+            options: ["text(30)", "character varying مع ضبط Length/Precision = 30", "character مع ضبط Length = 30", "nvarchar(30)"],
+            ans: 1,
+            exp: "ممتاز! في pgAdmin لا يظهر اسم varchar(30) جاهزاً بل نختار character varying ثم نكتب 30 في حقل Length/Precision."
+          },
+          {
+            q: "ما هو النوع الدقيق للعمود hours في جدول works_on ولماذا نترك خيار Not NULL = No؟",
+            options: ["integer ولأنه مفتاح أساسي", "numeric(4,1) ونتركه يسمح بـ NULL لأن السجل الأخير في بيانات المثال (888665555 مع المشروع 20) قيمته [null]", "character(4) ولأنه نصي", "date"],
+            ans: 1,
+            exp: "رائع! hours نوعه numeric(4,1) أي 4 خانات إجمالية منها خانة عشرية واحدة (مثل 32.5)، ويسمح بـ NULL."
+          }
+        ]
+      },
+      {
+        id: 10,
+        lecture: 4,
+        title: "أسرار pgAdmin 4: الاعتماد الدائري، ترتيب الإدخال، والأخطاء الشائعة",
+        subtitle: "المحاضرة 4 عملي (صفحة 6 إلى 28) — كيف تبني القاعدة وتدخل البيانات دون أي خطأ؟",
+        intro: "عندما تبدأ بإنشاء الجداول وإدخال البيانات في pgAdmin 4، ستواجه 3 ألغاز عملية إذا لم تنتبه لها سيتوقف البرنامج ويرفض الإدخال! تعال نفككها بالتفصيل:",
+        concepts: [
+          {
+            title: "1. حل لغز الاعتماد الدائري (Circular Reference) بين DEPARTMENT و EMPLOYEE",
+            body: "جدول <span class='ltr-inline'>DEPARTMENT</span> يحتاج <span class='ltr-inline'>mgrssn</span> من الموظفين، وجدول <span class='ltr-inline'>EMPLOYEE</span> يحتاج <span class='ltr-inline'>dno</span> من الأقسام! كيف نحل الدائرة المرجعية؟<br><strong>الحل ذو الـ 5 خطوات:</strong> 1) ننشئ <span class='ltr-inline'>department</span> بدون <span class='ltr-inline'>FK</span> لـ <span class='ltr-inline'>mgrssn</span> ونجعل <span class='ltr-inline'>mgrssn, mgrstartdate</span> يقبلان <span class='ltr-inline'>NULL</span> مؤقتاً &rarr; 2) ندخل الأقسام الثلاثة (5، 4، 1) بمدير <span class='ltr-inline'>[null]</span> &rarr; 3) ندخل جميع الموظفين &rarr; 4) نعدل صفوف <span class='ltr-inline'>department</span> ونملأ أرقام المدراء وتواريخهم &rarr; 5) نضيف قيد <span class='ltr-inline'>FK (fk_department_manager)</span> ونفعّل <span class='ltr-inline'>Not NULL = Yes</span>!"
+          },
+          {
+            title: "2. ترتيب إدخال الموظفين بسبب الإشراف الذاتي (Self Foreign Key)",
+            body: "لأن <span class='ltr-inline'>superssn</span> يشير إلى <span class='ltr-inline'>employee.ssn</span>، يجب إدخال المشرف قبل مرؤوسيه:<br>&bull; <strong>أولاً:</strong> ندخل المدير العام <span class='ltr-inline'>James E Borg (888665555)</span> لأن <span class='ltr-inline'>superssn</span> له هو <span class='ltr-inline'>[null]</span>.<br>&bull; <strong>ثانياً:</strong> ندخل <span class='ltr-inline'>Franklin T Wong (333445555)</span> و <span class='ltr-inline'>Jennifer S Wallace (987654321)</span> لأن مشرفهما هو <span class='ltr-inline'>James</span>.<br>&bull; <strong>ثالثاً:</strong> ندخل بقية الموظفين!"
+          },
+          {
+            title: "3. المفتاح المركب، إدخال [null]، وأداة ERD Tool",
+            body: "&bull; <strong>المفتاح المركب:</strong> لا تفعّل <span class='ltr-inline'>PK</span> لكل عمود منفرداً في <span class='ltr-inline'>Columns</span>! أنشئ قيد <span class='ltr-inline'>Primary Key</span> واحداً من تبويب <span class='ltr-inline'>Constraints</span> يضم العمودين معاً.<br>&bull; <strong>إدخال البيانات:</strong> <span class='ltr-inline'>Right Click &rarr; View/Edit Data &rarr; All Rows</span> ثم <span class='ltr-inline'>Save Data Changes</span>. للتاريخ نكتب <span class='ltr-inline'>YYYY-MM-DD</span>، وللقيمة الخالية نتركها <span class='ltr-inline'>[null]</span> أو <span class='ltr-inline'>Set NULL</span> ولا نكتب كلمة NULL كنص!"
+          }
+        ],
+        visualType: "pgadmin_workflow",
+        trap: "إذا فتحت Tools -> ERD Tool ولم يظهر خط العلاقة بين جدولين، فالسبب الأكثر شيوعاً هو أن قيد Foreign Key لم يُحفظ (Save) في تبويب Constraints أو تم اختيار الجدول/العمود المرجعي بشكل غير صحيح.",
+        quizzes: [
+          {
+            q: "لماذا يجب إدخال الموظف James E Borg كأول سجل في جدول employee قبل أي موظف آخر؟",
+            options: ["لأن اسمه يبدأ بحرف J", "لأنه لا يملك مشرفاً (superssn = [null]) وهو المشرف على Franklin و Jennifer، وبسبب قيد Self Foreign Key يجب وجود المشرف قبل الموظف الذي يشير إليه", "لأنه يعمل في القسم رقم 5", "لأن راتبه الأقل"],
+            ans: 1,
+            exp: "أحسنت! قيد المفتاح الأجنبي الذاتي (fk_employee_supervisor) يشترط أن تكون قيمة superssn موجودة مسبقاً في عمود ssn أو أن تكون [null]."
+          },
+          {
+            q: "ما هو الخطأ الذي يحدث إذا كتبت كلمة NULL بيدك داخل خلية عنوان أو اسم في شبكة بيانات pgAdmin؟",
+            options: ["يحذف السجل بالكامل", "تُخزن كسلسلة نصية حرفية اسمها 'NULL' وليس كقيمة خالية حقيقية (يجب تركها [null] أو اختيار Set NULL)", "يغلق البرنامج", "يتحول العمود إلى رقم"],
+            ans: 1,
+            exp: "صحيح 100%! كتابة كلمة NULL في عمود نصي يجعلها نصاً عادياً مكوناً من 4 حروف، والصحيح تركها [null] أو استخدام Set NULL."
+          }
+        ]
+      },
+      {
+        id: 11,
+        lecture: 5,
+        title: "مدخل إلى لغة SQL: الفئات الأربع (DQL, DML, DDL, DCL) وبنية SELECT",
+        subtitle: "المحاضرة 5 عملي (صفحة 2) — تقسيم أوامر SQL القياسية والترتيب الإلزامي",
+        intro: "وصلنا إلى لغة الاستفسارات البنيوية SQL (Structured Query Language)! أول سؤال كلاسيكي في أي فحص: ما هي الفئات الأربع لعبارات SQL؟ وما هو الترتيب الصحيح لأجزاء جملة SELECT؟",
+        concepts: [
+          {
+            title: "1. الفئات الأربع لعبارات SQL القياسية (احفظ الجدول عن ظهر قلب!)",
+            body: "&bull; <span class='ltr-inline'>DQL (Data Query Language)</span>: تضم الأمر <strong><code>SELECT</code></strong> فقط — تقوم باستعادة البيانات من قاعدة البيانات وعرضها في <strong>جدول مؤقت</strong>.<br>&bull; <span class='ltr-inline'>DML (Data Manipulation Language)</span>: تضم <strong><code>INSERT, UPDATE, DELETE</code></strong> — تقوم بالتعديل على البيانات (السجلات) الموجودة في قاعدة البيانات.<br>&bull; <span class='ltr-inline'>DDL (Data Definition Language)</span>: تضم <strong><code>CREATE, ALTER, DROP, TRUNCATE</code></strong> — تتعامل مع <strong>بنية وهيكلية</strong> قاعدة البيانات.<br>&bull; <span class='ltr-inline'>DCL (Data Control Language)</span>: تضم <strong><code>GRANT, REVOKE</code></strong> — لمنح وسحب السماحيات."
+          },
+          {
+            title: "2. الترتيب الإلزامي لأجزاء جملة SELECT الستة",
+            body: "عند كتابة استعلام <span class='ltr-inline'>SELECT</span> يجب الالتزام بالترتيب التالي:<br><span class='ltr-inline'>1. SELECT</span> &rarr; <span class='ltr-inline'>2. FROM</span> &rarr; <span class='ltr-inline'>3. WHERE</span> &rarr; <span class='ltr-inline'>4. GROUP BY</span> &rarr; <span class='ltr-inline'>5. HAVING</span> &rarr; <span class='ltr-inline'>6. ORDER BY</span>."
+          }
+        ],
+        visualType: "sql_categories_game",
+        trap: "نكشة شائعة جداً: الطلاب يخلطون بين DELETE و DROP و TRUNCATE! تذكر: DELETE هي من عائلة DML (تحذف سجلات بيانات)، بينما CREATE, ALTER, DROP, TRUNCATE كلها من عائلة DDL لأنها تتعامل مع بنية الجدول!",
+        quizzes: [
+          {
+            q: "إلى أي فئة من فئات لغة SQL تنتمي الأوامر (CREATE, ALTER, DROP, TRUNCATE)؟",
+            options: ["DQL (Data Query Language)", "DML (Data Manipulation Language)", "DDL (Data Definition Language)", "DCL (Data Control Language)"],
+            ans: 2,
+            exp: "بطل! DDL هي لغة تعريف البيانات المسؤولة عن بنية الجداول وقاعدة البيانات."
+          },
+          {
+            q: "عندما ننفذ تعليمة SELECT على جدول أو عدة جداول في قاعدة البيانات، أين توضع النتيجة قبل عرضها؟",
+            options: ["تحذف الجدول الأصلي", "يتم وضع النتيجة في جدول مؤقت ومن ثم يتم عرضها", "تخزن في ملف نصي خارجي", "تعدل السجلات الدائمة"],
+            ans: 1,
+            exp: "صحيح! كما ورد حرفياً في المحاضرة الخامسة: 'سيتم وضعها في جدول مؤقت ومن ثم يتم عرضها'."
+          }
+        ]
+      },
+      {
+        id: 12,
+        lecture: 5,
+        title: "خفايا SELECT: الترتيب ORDER BY، منع التكرار DISTINCT، و TOP / PERCENT",
+        subtitle: "المحاضرة 5 عملي (صفحة 3، 5، 6) — الاستعلامات 1 إلى 8",
+        intro: "تعال نتعلم كيف نتحكم بشكل الأعمدة والصفوف المعروضة في SELECT: كيف ندمج الأعمدة؟ كيف نضع اسماً مستعاراً فيه فراغ؟ كيف نمنع التكرار؟ وكيف نأخذ أول 10 سجلات أو 50% منها؟",
+        concepts: [
+          {
+            title: "1. DISTINCT مقابل ALL، و TOP exp [PERCENT]",
+            body: "&bull; <strong><code>DISTINCT</code>:</strong> تكتب <strong>مباشرة بعد كلمة SELECT</strong> للتخلص من السجلات المتكررة (مثال: <code>SELECT DISTINCT Essn FROM WORKS_ON</code>). أما الحالة الافتراضية فهي <strong><code>ALL</code></strong>.<br>&bull; <strong><code>TOP exp [PERCENT]</code>:</strong> تعيد أول <span class='ltr-inline'>n</span> سجل (مثال: <code>SELECT TOP(10) pname FROM PROJECT</code>)، أو نسبة مئوية باستخدام <code>PERCENT</code> (مثال: <code>SELECT TOP 50 PERCENT * FROM EMPLOYEE</code>)."
+          },
+          {
+            title: "2. الترتيب ORDER BY، دمج النصوص (+)، والاسم المستعار [ ]",
+            body: "&bull; <strong><code>ORDER BY col [ASC | DESC]</code>:</strong> ترتب النتائج تصاعدياً <code>ASC</code> (<strong>وهو الترتيب الافتراضي</strong>) أو تنازلياً <code>DESC</code>.<br>&bull; <strong>الاسم المستعار (Alias) والفراغات:</strong> إذا احتوى الاسم على فراغ نضعه بين قوسين مربعين <code>[full name]</code> (مع كلمة <code>AS</code> أو بدونها). ولدمج الاسم الثلاثي نستخدم <code>+</code>: <code>SELECT fname + ' ' + minit + ' ' + lname [full name] FROM EMPLOYEE</code>."
+          }
+        ],
+        visualType: "select_modifiers_demo",
+        trap: "انتبه: في تعليمة إظهار أرقام الموظفين التابعين لأي مشروع دون تكرار (الاستعلام 6)، نستعلم من جدول WORKS_ON وليس من جدول EMPLOYEE، ونكتب: SELECT DISTINCT Essn FROM WORKS_ON!",
+        quizzes: [
+          {
+            q: "ما هي الحالة الافتراضية للترتيب في عبارة ORDER BY إذا لم نكتب ASC أو DESC؟ وما هي الحالة الافتراضية لتكرار السجلات في SELECT إذا لم نكتب DISTINCT؟",
+            options: ["الترتيب الافتراضي تنازلي DESC، والتكرار الافتراضي DISTINCT", "الترتيب الافتراضي تصاعدي ASC، والحالة الافتراضية للسجلات هي ALL (إعادة كل السجلات)", "الترتيب عشوائي", "يعطي خطأ برمجياً"],
+            ans: 1,
+            exp: "ممتاز! الترتيب الافتراضي في ORDER BY هو تصاعدي (ASC)، والحالة الافتراضية في SELECT هي ALL."
+          },
+          {
+            q: "أي استعلام مما يلي يعرض 50% من بيانات الموظفين بشكل صحيح؟",
+            options: ["SELECT 50% * FROM EMPLOYEE", "SELECT TOP 50 PERCENT * FROM EMPLOYEE", "SELECT DISTINCT 50 PERCENT FROM EMPLOYEE", "SELECT * FROM EMPLOYEE WHERE TOP = 50%"],
+            ans: 1,
+            exp: "صحيح! الصيغة القياسية في SQL Server هي SELECT TOP 50 PERCENT * FROM EMPLOYEE."
+          }
+        ]
+      },
+      {
+        id: 13,
+        lecture: 5,
+        title: "شروط WHERE، المعاملات (BETWEEN, IN, IS NULL)، وأولويات البوابات المنطقية",
+        subtitle: "المحاضرة 5 عملي (صفحة 4، 6، 7) — الاستعلامات 9 إلى 15",
+        intro: "عبارة WHERE هي المصفاة التي تختار السجلات المطلوبة فقط! لا يشترط أبداً أن يكون العمود الذي نختبره في WHERE موجوداً ضمن الأعمدة المعروضة بعد SELECT. لنكتشف معاملاتها الذكية!",
+        concepts: [
+          {
+            title: "1. المعاملات الخاصة: BETWEEN، IN / NOT IN، ANY / SOME / ALL، و IS NULL",
+            body: "&bull; <code>salary BETWEEN 5000 AND 10000</code>: يفحص وقوع القيمة بين الحدين.<br>&bull; <code>essn IN (1, 7)</code> تكافئ <code>essn=1 OR essn=7</code>، ونفيها <code>dnum NOT IN (1, 4)</code>.<br>&bull; <code>&lt;col&gt; op &lt;ANY|SOME|ALL&gt; (subquery)</code>: تطابق أحد (<span class='ltr-inline'>ANY/SOME</span>) أو كل (<span class='ltr-inline'>ALL</span>) القيم.<br>&bull; <code>IS NULL</code> و <code>IS NOT NULL</code>: لفحص القيم الخالية."
+          },
+          {
+            title: "2. أولويات العمليات المنطقية، وإيجاد مدير الشركة والموظف الأعلى راتباً",
+            body: "&bull; <strong>الأفضلية المنطقية:</strong> أولاً <strong><code>NOT</code></strong> &rarr; ثم <strong><code>AND</code></strong> &rarr; ثم <strong><code>OR</code></strong> (وتُستخدم الأقواس لتحديد الأفضلية).<br>&bull; <strong>استعلام 14 (مدير الشركة):</strong> مدير الشركة هو الموظف الذي لا يملك مشرفاً فوقه: <code>SELECT fname+' '+lname [manger name] FROM EMPLOYEE WHERE superssn IS NULL</code>.<br>&bull; <strong>استعلام 15 (الموظف ذو الراتب الأعلى في القسم 1):</strong> نرتب تنازلياً ونأخذ الأول: <code>SELECT TOP(1) * FROM EMPLOYEE WHERE dno=1 ORDER BY salary DESC</code>."
+          }
+        ],
+        visualType: "where_evaluator",
+        trap: "نكشة قاتلة في الامتحان: إذا طلب 'الموظفين الذين لا نعرف عنوانهم' أو 'مدير الشركة (الذي لا يملك مشرفاً)'، إياك أن تكتب address = NULL أو superssn = NULL! في SQL نكتب حصراً: address IS NULL و superssn IS NULL.",
+        quizzes: [
+          {
+            q: "ما هو ترتيب الأفضلية (الأولوية) الصحيح للمعاملات المنطقية في SQL من الأعلى إلى الأدنى؟",
+            options: ["AND ثم OR ثم NOT", "OR ثم AND ثم NOT", "أولاً NOT ثم يأتي AND وبعدها يأتي OR (ويمكن استخدام الأقواس لتحديد الأفضلية)", "جميعها بنفس الأولوية"],
+            ans: 2,
+            exp: "أحسنت! NOT هي الأقوى، تليها AND، وأخيراً OR."
+          },
+          {
+            q: "كيف نكتب استعلاماً يعيد بيانات الموظف ذو الراتب الأعلى والتابع للقسم الأول (الاستعلام 15)؟",
+            options: ["SELECT TOP(1) * FROM EMPLOYEE WHERE dno=1 ORDER BY salary ASC", "SELECT TOP(1) * FROM EMPLOYEE WHERE dno=1 ORDER BY salary DESC", "SELECT * FROM EMPLOYEE WHERE dno=1 AND salary = HIGH", "SELECT TOP(10) * FROM DEPARTMENT"],
+            ans: 1,
+            exp: "ممتاز! عندما نرتب الرواتب تنازلياً (ORDER BY salary DESC) يصبح صاحب أعلى راتب في السطر الأول، فنلتقطه بـ TOP(1)!"
+          }
+        ]
+      },
+      {
+        id: 14,
+        lecture: 5,
+        title: "أسرار المعامل LIKE والرموز البديلة (Wildcards) والتعليقات في SQL",
+        subtitle: "المحاضرة 5 عملي (صفحة 4 و 7) — الاستعلامات 16 و 17 والملاحظات الختامية",
+        intro: "ماذا لو أردنا البحث عن قسم يبدأ اسمه بحرف 'h'، أو يبدأ بأي حرف من 'a' إلى 'h'؟ هنا نستخدم المعامل النصي LIKE مع الرموز البديلة الأربعة!",
+        concepts: [
+          {
+            title: "1. الرموز البديلة الأربعة (Wildcards) مع المعامل LIKE",
+            body: "&bull; <strong><code>%</code> (النسبة المئوية):</strong> تدل على وجود <strong>عدة محارف</strong> (أو صفر محرف). مثال: <code>dname LIKE 'h%'</code> يعني يبدأ بالحرف h.<br>&bull; <strong><code>_</code> (الشرطة السفلية):</strong> تدل على وجود <strong>محرف واحد فقط</strong>. مثال: <code>'_a%'</code> يعني الحرف الثاني هو a.<br>&bull; <strong><code>[ ]</code> (القوسان المربعان):</strong> أي محرف واحد يقع ضمن المجال أو القائمة. مثال: <code>dname LIKE '[a-h]%'</code> يعني يبدأ بأي حرف من a إلى h (أي a أو b أو ... أو h).<br>&bull; <strong><code>^</code> (إشارة الأس داخل القوسين):</strong> تعني <strong><code>NOT</code></strong> أي استثناء المحرف أو المجال التالي (مثل <code>'[^a-c]%'</code> لا يبدأ بـ a أو b أو c)."
+          },
+          {
+            title: "2. ملاحظات التعليقات في نهاية المحاضرة الخامسة",
+            body: "&bull; لتعليق <strong>سطر واحد</strong> نستخدم شرطتين: <code>-- تعليق سطر</code>.<br>&bull; لتعليق <strong>عدة أسطر</strong> نستخدم: <code>/* تعليق عدة أسطر */</code>."
+          }
+        ],
+        visualType: "like_tester",
+        trap: "فرّق جيداً بين استخدام القوسين المربعين [ ] في مكانين مختلفين: خارج النصوص مثل [first name] تستخدم لإحاطة اسم العمود الذي يحوي فراغاً، أما داخل علامتي التنصيص مع LIKE مثل '[a-h]%' فتستخدم لتحديد مجال محارف!",
+        quizzes: [
+          {
+            q: "ما هو الاستعلام الصحيح لإظهار بيانات الأقسام التي يبدأ اسمها بأي حرف من (a) إلى (h)؟",
+            options: ["SELECT * FROM DEPARTMENT WHERE dname LIKE 'a-h%'", "SELECT * FROM DEPARTMENT WHERE dname LIKE '[a-h]%'", "SELECT * FROM DEPARTMENT WHERE dname BETWEEN 'a' AND 'h'", "SELECT * FROM DEPARTMENT WHERE dname LIKE '_a-h'"],
+            ans: 1,
+            exp: "رائع! '[a-h]%' تعني أن المحرف الأول يقع في المجال من a إلى h ويتبعه أي عدد من المحارف %."
+          },
+          {
+            q: "ماذا تعني الإشارة ^ عند استخدامها داخل القوسين في المعامل LIKE (مثل '[^a-c]%')؟",
+            options: ["تعني بداية السطر", "تعني NOT أي أن المحرف التالي سوف يتم استثناؤه", "تعني تكرار الحرف", "تعني محرفاً واحداً فقط"],
+            ans: 1,
+            exp: "صحيح! في SQL Server داخل LIKE، الرمز ^ يعني NOT (استثناء المحارف المحددة)."
+          }
+        ]
+      },
+      {
+        id: 15,
+        lecture: 6,
+        title: "التجميع بـ GROUP BY وتوابع التجميع الخمسة وشرط HAVING",
+        subtitle: "المحاضرة 6 عملي (صفحة 2، 3، 4) — القواعد الـ 7 الذهبية للتجميع",
+        intro: "في المحاضرة السادسة ننتقل لمستوى أقوى: بدلاً من عرض كل موظف لوحده، نريد تجميع الموظفين حسب أقسامهم (GROUP BY dno) لنحسب عددهم أو مجموع رواتبهم أو أعلى راتب في كل قسم!",
+        concepts: [
+          {
+            title: "1. توابع التجميع الخمسة (Aggregate Functions)",
+            body: "1) <code>MAX(col)</code>: أكبر قيمة &nbsp;|&nbsp; 2) <code>MIN(col)</code>: أصغر قيمة &nbsp;|&nbsp; 3) <code>COUNT(col) / COUNT(*)</code>: عدد القيم/السجلات &nbsp;|&nbsp; 4) <code>AVG(col)</code>: المعدل (المتوسط) &nbsp;|&nbsp; 5) <code>SUM(col)</code>: المجموع."
+          },
+          {
+            title: "2. القواعد الـ 7 الذهبية (منجم أسئلة الفحص!)",
+            body: "1) مع <code>GROUP BY</code>، كل عمود في <code>SELECT</code> يجب إما أن يكون <strong>مجمعاً بتابع تجميع</strong> أو <strong>جزءاً من عبارة <code>GROUP BY</code></strong>.<br>2) <strong>ممنوع</strong> تطبيق <code>GROUP BY</code> على الاسم المستعار (Alias)، بل على الاسم الأصلي للعمود فقط (بينما <code>ORDER BY</code> تقبل الاسم المستعار!).<br>3) لوضع شرط على قيم التجميع نستخدم <strong><code>HAVING</code></strong> وليس <code>WHERE</code> (مثل <code>HAVING AVG(hours) &gt; 5</code>).<br>4) <strong>كل تابع تجميع يتجاهل <code>NULL</code>، ما عدا <code>COUNT(*)</code>!</strong><br>5) لعد القيم غير المكررة: <code>COUNT(DISTINCT [col_name])</code>.<br>6) يمكن استخدام <code>DISTINCT</code> مع جميع توابع التجميع.<br>7) يمكن استخدام توابع التجميع خارج عملية التجميع (بدون <code>GROUP BY</code>)."
+          }
+        ],
+        visualType: "groupby_visualizer",
+        trap: "انتبه للاستعلام الأخير في صفحة 4 من المحاضرة السادسة: 'إظهار عدد الموظفين الذين معدل رواتبهم أكبر من 20000 في كل قسم': نكتب SELECT COUNT(ssn) FROM EMPLOYEE GROUP BY dno HAVING AVG(salary) > 20000. لاحظ أننا عرضنا COUNT(ssn) بينما وضعنا الشرط في HAVING على AVG(salary) وهذا صحيح تماماً!",
+        quizzes: [
+          {
+            q: "أي من العبارات التالية صحيحة حول توابع التجميع والقيمة الخالية NULL؟",
+            options: ["جميع توابع التجميع تحسب NULL كصفر", "كل تابع تجميع يتجاهل NULL، ما عدا التابع COUNT(*) فإنه يعد جميع السجلات", "COUNT(col_name) يعد القيم الخالية NULL بينما COUNT(*) يتجاهلها", "لا يمكن استخدام DISTINCT مع توابع التجميع"],
+            ans: 1,
+            exp: "إجابة ذهبية! كل تابع تجميع يتجاهل NULL ما عدا COUNT(*)."
+          },
+          {
+            q: "لماذا يعطي الاستعلام التالي خطأ: SELECT dno AS dept_id, COUNT(*) FROM EMPLOYEE GROUP BY dept_id ؟",
+            options: ["لأن COUNT(*) لا تعمل مع GROUP BY", "لأنه لا يمكن تطبيق GROUP BY على الاسم المستعار (dept_id) بل يجب كتابة اسم العمود الأصلي GROUP BY dno", "لأنه يجب استخدام WHERE بدل GROUP BY", "لأن dno نصي"],
+            ans: 1,
+            exp: "أحسنت! GROUP BY تُنفذ منطقياً قبل اعتماد الاسم المستعار في SELECT، لذلك لا تقبل الاسم المستعار أبداً (بينما ORDER BY تقبله)."
+          }
+        ]
+      },
+      {
+        id: 16,
+        lecture: 6,
+        title: "الدوال الجاهزة (Built-in Functions): التاريخ، الرياضيات، النصوص، و ISNULL",
+        subtitle: "المحاضرة 6 عملي (صفحة 5، 6، 7) — المحطة الأخيرة لإتقان المادة 100%!",
+        intro: "المحطة الختامية! يقدم SQL Server 2008 مجموعة من الدوال الجاهزة للتعامل مع التواريخ، العمليات الرياضية، السلاسل المحرفية (String)، وفحص القيم الخالية بـ ISNULL. لنحفظها بذكاء!",
+        concepts: [
+          {
+            title: "1. دوال التاريخ والوقت (Date & Time) وملاحظة مقارنة التاريخ",
+            body: "&bull; <code>GETDATE()</code>: التاريخ والوقت الحاليان &nbsp;|&nbsp; <code>DAY(d), MONTH(d), YEAR(d)</code>: اليوم، الشهر، السنة كأرقام.<br>&bull; <code>DATEPART(date_part, d)</code>: يعيد الجزء المحدد <strong>كرقم</strong> &nbsp;|&nbsp; <code>DATENAME(date_part, d)</code>: يعيد <strong>اسم</strong> الجزء <strong>كنص</strong>.<br>&bull; <code>DATEDIFF(date_part, start_date, end_date)</code>: يعيد الفرق الرقمي بين تاريخين.<br>&bull; <strong>اختصارات <code>date_part</code>:</strong> السنة <code>yy, yyyy</code> | الربع <code>qq, q</code> | الشهر <code>mm, m</code> | يوم بالسنة <code>dy, y</code> | اليوم <code>dd, d</code> | الأسبوع <code>wk, ww</code> | الساعة <code>hh</code> | الدقيقة <code>mi, n</code> | الثانية <code>ss, s</code> | ميلي ثانية <code>ms</code>.<br>&bull; <strong>ملاحظة هامة:</strong> لمقارنة أو تمرير التاريخ يوضع بين إشارتي تنصيص <strong>بلا فواصل</strong> مثل <code>'19900101'</code>."
+          },
+          {
+            title: "2. الدوال الرياضية، دوال السلاسل (String)، والتابع ISNULL",
+            body: "&bull; <strong>الرياضية:</strong> <code>ABS(x)</code> القيمة المطلقة | <code>SQUARE(x)</code> المربع | <code>SQRT(x)</code> الجذر التربيعي | <code>POWER(x,y)</code> القوة | <code>SIN(), COS()</code>.<br>&bull; <strong>النصية:</strong> <code>ASCII('a') &rarr; 97</code> | <code>CHAR(65) &rarr; 'A'</code> | <code>LOWER('ABC') &rarr; 'abc'</code> | <code>UPPER('abC') &rarr; 'ABC'</code> | <code>LEFT('abcdef',2) &rarr; 'ab'</code> | <code>RIGHT('abcd',3) &rarr; 'bcd'</code> | <code>SUBSTRING('abcde',3,2) &rarr; 'cd'</code> | <code>STR(int_exp)</code> تحويل لنص.<br>&bull; <strong><code>ISNULL(exp_to_test, val_if_null)</code>:</strong> إذا كان الوسيط الأول <code>NULL</code> يعيد قيمة الوسيط الثاني، وإلا يعيد قيمة الوسيط الأول نفسها (مثال: <code>SELECT ISNULL(address, 0) FROM EMPLOYEE</code>)."
+          }
+        ],
+        visualType: "functions_playground",
+        trap: "نكشة SUBSTRING('abcde', 3, 2): أنت كمبرمج جافاسكريبت/C++ متعود أن الفهرس يبدأ من 0، لكن في SQL يبدأ ترقيم الحروف من 1! لذلك الحرف رقم 3 في 'abcde' هو 'c'، وبطول 2 يعيد 'cd'!",
+        quizzes: [
+          {
+            q: "ما هو ناتج تنفيذ التعليمة التالية في SQL Server: SELECT SUBSTRING('abcde', 3, 2) ؟",
+            options: ["'bc'", "'cd'", "'cde'", "'ab'"],
+            ans: 1,
+            exp: "ممتاز! الحرف الأول هو a(1)، الثاني b(2)، الثالث c(3). نبدأ من الموضع 3 ('c') ونأخذ حرفين (2) فتكون النتيجة 'cd'."
+          },
+          {
+            q: "ما هو الفرق بين الدالتين DATEPART(month, getdate()) و DATENAME(month, getdate())؟",
+            options: ["لا يوجد فرق بينهما", "DATEPART تعيد رقم الشهر (مثلاً 11)، بينما DATENAME تعيد اسم الشهر كنص (مثلاً 'November')", "DATEPART تعيد السنة فقط", "DATENAME تحسب الفرق بين تاريخين"],
+            ans: 1,
+            exp: "رائع! DATEPART تعيد الجزء كقيمة رقمية، بينما DATENAME تعيد اسم الجزء كسلسلة نصية."
+          }
+        ]
+      }
+    ];
+
+    // ==================== DATA: COMPANY REFERENCE TABLES ====================
+    const COMPANY_DB = {
+      DEPARTMENT: [
+        { dname: "Research", dnumber: 5, mgrssn: "333445555", mgrstartdate: "1988-05-22" },
+        { dname: "Administration", dnumber: 4, mgrssn: "987654321", mgrstartdate: "1995-01-01" },
+        { dname: "Headquarters", dnumber: 1, mgrssn: "888665555", mgrstartdate: "1981-06-19" }
+      ],
+      EMPLOYEE: [
+        { fname: "James", minit: "E", lname: "Borg", ssn: "888665555", bdate: "1937-11-10", address: "450 Stone, Houston, TX", sex: "M", salary: 55000, superssn: null, dno: 1 },
+        { fname: "Franklin", minit: "T", lname: "Wong", ssn: "333445555", bdate: "1955-12-08", address: "638 Voss, Houston, TX", sex: "M", salary: 40000, superssn: "888665555", dno: 5 },
+        { fname: "Jennifer", minit: "S", lname: "Wallace", ssn: "987654321", bdate: "1941-06-20", address: "291 Berry, Bellaire, TX", sex: "F", salary: 43000, superssn: "888665555", dno: 4 },
+        { fname: "John", minit: "B", lname: "Smith", ssn: "123456789", bdate: "1965-01-09", address: "731 Fondren, Houston, TX", sex: "M", salary: 30000, superssn: "333445555", dno: 5 },
+        { fname: "Ramesh", minit: "K", lname: "Narayan", ssn: "666884444", bdate: "1962-09-15", address: "975 Fire Oak, Humble, TX", sex: "M", salary: 38000, superssn: "333445555", dno: 5 },
+        { fname: "Joyce", minit: "A", lname: "English", ssn: "453453453", bdate: "1972-07-31", address: "5631 Rice, Houston, TX", sex: "F", salary: 25000, superssn: "333445555", dno: 5 },
+        { fname: "Alicia", minit: "J", lname: "Zelaya", ssn: "999887777", bdate: "1968-01-19", address: "3321 Castle, Spring, TX", sex: "F", salary: 25000, superssn: "987654321", dno: 4 },
+        { fname: "Ahmad", minit: "V", lname: "Jabbar", ssn: "987987987", bdate: "1969-03-29", address: "980 Dallas, Houston, TX", sex: "M", salary: 25000, superssn: "987654321", dno: 4 }
+      ],
+      DEPT_LOCATIONS: [
+        { dnumber: 1, dlocation: "Houston" },
+        { dnumber: 4, dlocation: "Stafford" },
+        { dnumber: 5, dlocation: "Bellaire" },
+        { dnumber: 5, dlocation: "Sugarland" },
+        { dnumber: 5, dlocation: "Houston" }
+      ],
+      PROJECT: [
+        { pname: "ProductX", pnumber: 1, plocation: "Bellaire", dnum: 5 },
+        { pname: "ProductY", pnumber: 2, plocation: "Sugarland", dnum: 5 },
+        { pname: "ProductZ", pnumber: 3, plocation: "Houston", dnum: 5 },
+        { pname: "Computerization", pnumber: 10, plocation: "Stafford", dnum: 4 },
+        { pname: "Reorganization", pnumber: 20, plocation: "Houston", dnum: 1 },
+        { pname: "Newbenefits", pnumber: 30, plocation: "Stafford", dnum: 4 }
+      ],
+      WORKS_ON: [
+        { essn: "123456789", pno: 1, hours: 32.5 },
+        { essn: "123456789", pno: 2, hours: 7.5 },
+        { essn: "666884444", pno: 3, hours: 40.0 },
+        { essn: "453453453", pno: 1, hours: 20.0 },
+        { essn: "453453453", pno: 2, hours: 20.0 },
+        { essn: "333445555", pno: 2, hours: 10.0 },
+        { essn: "333445555", pno: 3, hours: 10.0 },
+        { essn: "333445555", pno: 10, hours: 10.0 },
+        { essn: "333445555", pno: 20, hours: 10.0 },
+        { essn: "999887777", pno: 30, hours: 30.0 },
+        { essn: "999887777", pno: 10, hours: 10.0 },
+        { essn: "987987987", pno: 10, hours: 35.0 },
+        { essn: "987987987", pno: 30, hours: 5.0 },
+        { essn: "987654321", pno: 30, hours: 20.0 },
+        { essn: "987654321", pno: 20, hours: 15.0 },
+        { essn: "888665555", pno: 20, hours: null }
+      ],
+      DEPENDENT: [
+        { essn: "333445555", dependent_name: "Alice", sex: "F", bdate: "1986-04-05", relationship: "Daughter" },
+        { essn: "333445555", dependent_name: "Theodore", sex: "M", bdate: "1983-10-25", relationship: "Son" },
+        { essn: "333445555", dependent_name: "Joy", sex: "F", bdate: "1958-05-03", relationship: "Spouse" },
+        { essn: "987654321", dependent_name: "Abner", sex: "M", bdate: "1942-02-28", relationship: "Spouse" },
+        { essn: "123456789", dependent_name: "Michael", sex: "M", bdate: "1988-01-04", relationship: "Son" },
+        { essn: "123456789", dependent_name: "Alice", sex: "F", bdate: "1988-12-30", relationship: "Daughter" },
+        { essn: "123456789", dependent_name: "Elizabeth", sex: "F", bdate: "1967-05-05", relationship: "Spouse" }
+      ]
+    };
+
+    // ==================== DATA: 24 SQL EXERCISES (LECTURES 5 & 6) ====================
+    const SQL_EXERCISES = [
+      { id: 1, cat: "lec5", title: "1. إظهار بيانات كل الموظفين", sql: "select * from EMPLOYEE", exp: "النجمة (*) تعني استرجاع كافة الأعمدة من جدول EMPLOYEE.", getRows: () => COMPANY_DB.EMPLOYEE },
+      { id: 2, cat: "lec5", title: "2. إظهار أسماء الموظفين وعنوانهم", sql: "select fname, lname, address from EMPLOYEE", exp: "نحدد أسماء الأعمدة المطلوبة مفصولة بفاصلة.", getRows: () => COMPANY_DB.EMPLOYEE.map(e => ({ fname: e.fname, lname: e.lname, address: e.address })) },
+      { id: 3, cat: "lec5", title: "3. إظهار أسماء الموظفين مرتبة ترتيباً تصاعدياً", sql: "select fname as [first name] from EMPLOYEE order by [first name]", exp: "الترتيب الافتراضي لـ ORDER BY هو تصاعدي ASC، وتقبل الاسم المستعار الموضوع بين [ ] لوجود فراغ.", getRows: () => [...COMPANY_DB.EMPLOYEE].sort((a,b)=>a.fname.localeCompare(b.fname)).map(e => ({ "first name": e.fname })) },
+      { id: 4, cat: "lec5", title: "4. إظهار الاسم الثلاثي للموظفين", sql: "select fname+' '+minit+' '+lname [full name] from EMPLOYEE", exp: "نستخدم معامل الجمع (+) لدمج السلاسل المحرفية مع فراغات بينها.", getRows: () => COMPANY_DB.EMPLOYEE.map(e => ({ "full name": `${e.fname} ${e.minit} ${e.lname}` })) },
+      { id: 5, cat: "lec5", title: "5. إظهار أسماء الموظفين ورواتبهم قبل وبعد زيادة 500", sql: "select fname+' '+lname [full name], salary as [befor salary], salary+500 as [new salary] from EMPLOYEE", exp: "يمكن إجراء عمليات حسابية مباشرة على العمود في قائمة SELECT.", getRows: () => COMPANY_DB.EMPLOYEE.map(e => ({ "full name": `${e.fname} ${e.lname}`, "befor salary": e.salary, "new salary": e.salary + 500 })) },
+      { id: 6, cat: "lec5", title: "6. إظهار أرقام الموظفين التابعين لأي مشروع دون تكرار", sql: "select distinct Essn from WORKS_ON", exp: "نستعلم من WORKS_ON ونضع DISTINCT مباشرة بعد SELECT لحذف التكرار.", getRows: () => [...new Set(COMPANY_DB.WORKS_ON.map(w => w.essn))].map(essn => ({ Essn: essn })) },
+      { id: 7, cat: "lec5", title: "7. إظهار أسماء العشر مشاريع الأولى", sql: "select top(10) pname from PROJECT", exp: "TOP(10) تعيد أول 10 سجلات من النتيجة.", getRows: () => COMPANY_DB.PROJECT.slice(0, 10).map(p => ({ pname: p.pname })) },
+      { id: 8, cat: "lec5", title: "8. إظهار 50% من بيانات الموظفين", sql: "select top 50 percent * from EMPLOYEE", exp: "TOP 50 PERCENT تعيد نصف السجلات (4 موظفين من أصل 8).", getRows: () => COMPANY_DB.EMPLOYEE.slice(0, 4) },
+      { id: 9, cat: "lec5", title: "9. بيانات الموظفين الذين رواتبهم بين 5000 و 10000", sql: "select * from EMPLOYEE where salary between 5000 and 10000", exp: "المعامل BETWEEN يفحص وقوع الراتب ضمن المجال المحدد شاملاً الطرفين.", getRows: () => COMPANY_DB.EMPLOYEE.filter(e => e.salary >= 5000 && e.salary <= 10000) },
+      { id: 10, cat: "lec5", title: "10. أسماء التابعين الذين رقم موظفهم 1 أو 7 (أو 333445555)", sql: "select dependent_name from DEPENDENT where essn in (1, 7)", exp: "المعامل IN يختبر انتماء القيمة للقائمة ويكافئ essn=1 OR essn=7.", getRows: () => COMPANY_DB.DEPENDENT.slice(0, 3).map(d => ({ dependent_name: d.dependent_name })) },
+      { id: 11, cat: "lec5", title: "11. أسماء المشاريع الذين لا يتبعون للقسم 1 أو 4", sql: "select pname from PROJECT where dnum not in (1, 4)", exp: "NOT IN تستثني المشاريع التابعة للقسمين 1 و 4 (فتعيد مشاريع القسم 5).", getRows: () => COMPANY_DB.PROJECT.filter(p => p.dnum !== 1 && p.dnum !== 4).map(p => ({ pname: p.pname })) },
+      { id: 12, cat: "lec5", title: "12. رواتب الموظفين الذين رواتبهم أكبر أو يساوي 30000", sql: "select salary from EMPLOYEE where salary >= 30000", exp: "استخدام معامل المقارنة >= في شرط WHERE.", getRows: () => COMPANY_DB.EMPLOYEE.filter(e => e.salary >= 30000).map(e => ({ salary: e.salary })) },
+      { id: 13, cat: "lec5", title: "13. أسماء الموظفين الذين راتبهم أكبر من 10000 ولا نعرف عنوانهم", sql: "select fname from EMPLOYEE where salary > 10000 and address is null", exp: "'لا نعرف عنوانهم' تُكتب حصراً address IS NULL وليس = NULL!", getRows: () => COMPANY_DB.EMPLOYEE.filter(e => e.salary > 10000 && e.address === null).map(e => ({ fname: e.fname })) },
+      { id: 14, cat: "lec5", title: "14. إظهار الاسم الكامل لمدير الشركة", sql: "select fname+' '+lname [manger name] from EMPLOYEE where superssn is null", exp: "نكشة هامة: مدير الشركة الأعلى لا يوجد له مشرف، أي superssn IS NULL (وهو James Borg)!", getRows: () => COMPANY_DB.EMPLOYEE.filter(e => e.superssn === null).map(e => ({ "manger name": `${e.fname} ${e.lname}` })) },
+      { id: 15, cat: "lec5", title: "15. بيانات الموظف ذو الراتب الأعلى وتابع للقسم الأول", sql: "select top(1) * from EMPLOYEE where dno=1 order by salary desc", exp: "نرشح القسم الأول dno=1 ثم نرتب تنازلياً حسب الراتب ونأخذ الأول بـ TOP(1).", getRows: () => [...COMPANY_DB.EMPLOYEE].filter(e => e.dno === 1).sort((a,b)=>b.salary-a.salary).slice(0,1) },
+      { id: 16, cat: "lec5", title: "16. بيانات الأقسام التي يبدأ اسمها بالحرف (h)", sql: "select * from DEPARTMENT where dname like 'h%'", exp: "'h%' تعني يبدأ بالحرف h ويتبعه أي عدد من المحارف.", getRows: () => COMPANY_DB.DEPARTMENT.filter(d => d.dname.toLowerCase().startsWith("h")) },
+      { id: 17, cat: "lec5", title: "17. بيانات الأقسام التي يبدأ اسمها بأي حرف من (a) إلى (h)", sql: "select * from DEPARTMENT where dname like '[a-h]%'", exp: "'[a-h]%' تعني الحرف الأول يقع ضمن المجال من a إلى h.", getRows: () => COMPANY_DB.DEPARTMENT.filter(d => /^[a-h]/i.test(d.dname)) },
+      { id: 18, cat: "lec6", title: "18. إظهار رقم الموظف ومعدل الساعات التي يعملها (GROUP BY)", sql: "select essn, AVG(hours) as avg from WORKS_ON group by essn", exp: "تجميع الساعات لكل موظف وحساب المتوسط بـ AVG(hours) (مع تجاهل NULL).", getRows: () => [
+        { essn: "123456789", avg: 20.0 }, { essn: "333445555", avg: 10.0 }, { essn: "453453453", avg: 20.0 },
+        { essn: "666884444", avg: 40.0 }, { essn: "888665555", avg: null }, { essn: "987654321", avg: 17.5 }, { essn: "987987987", avg: 20.0 }, { essn: "999887777", avg: 20.0 }
+      ]},
+      { id: 19, cat: "lec6", title: "19. إظهار رقم القسم وعدد الموظفين فيه", sql: "select dno, COUNT(*) as count from EMPLOYEE group by dno", exp: "COUNT(*) يحسب عدد سجلات الموظفين في كل قسم.", getRows: () => [
+        { dno: 1, count: 1 }, { dno: 4, count: 3 }, { dno: 5, count: 4 }
+      ]},
+      { id: 20, cat: "lec6", title: "20. إظهار أعلى راتب في كل قسم مرتباً تصاعدياً حسب الراتب الأعلى", sql: "select dno, max(salary) as max from EMPLOYEE group by dno order by max", exp: "لاحظ أن ORDER BY قبلت الاسم المستعار max بينما GROUP BY لا تقبل الأسماء المستعارة.", getRows: () => [
+        { dno: 5, max: 40000 }, { dno: 4, max: 43000 }, { dno: 1, max: 55000 }
+      ]},
+      { id: 21, cat: "lec6", title: "21. إظهار أعلى راتب في الشركة (خارج عملية التجميع)", sql: "select max(salary) as max from EMPLOYEE", exp: "استخدام تابع التجميع MAX بدون GROUP BY على الجدول كامل.", getRows: () => [{ max: 55000 }] },
+      { id: 22, cat: "lec6", title: "22. إظهار مجموع الرواتب في كل قسم", sql: "select SUM(salary) from EMPLOYEE group by dno", exp: "SUM(salary) يجمع رواتب موظفي كل قسم.", getRows: () => [{ SUM_salary: 55000 }, { SUM_salary: 93000 }, { SUM_salary: 133000 }] },
+      { id: 23, cat: "lec6", title: "23. رقم الموظف ومعدل ساعاته بشرط أن يكون معدل ساعاته أكبر من 5", sql: "select essn, AVG(hours) as avg from WORKS_ON group by essn having AVG(hours)>5", exp: "لأن الشرط على تابع التجميع AVG(hours)، استخدمنا HAVING بعد GROUP BY.", getRows: () => [
+        { essn: "123456789", avg: 20.0 }, { essn: "333445555", avg: 10.0 }, { essn: "453453453", avg: 20.0 },
+        { essn: "666884444", avg: 40.0 }, { essn: "987654321", avg: 17.5 }, { essn: "987987987", avg: 20.0 }, { essn: "999887777", avg: 20.0 }
+      ]},
+      { id: 24, cat: "lec6", title: "24. عدد الموظفين الذين معدل رواتبهم أكبر من 20000 في كل قسم", sql: "select COUNT(ssn) from EMPLOYEE group by dno having AVG(salary)>20000", exp: "عرضنا COUNT(ssn) وشرطنا في HAVING على AVG(salary)>20000.", getRows: () => [{ COUNT_ssn: 1 }, { COUNT_ssn: 3 }, { COUNT_ssn: 4 }] }
+    ];
+
+    // ==================== DATA: 30 EXAM QUESTIONS ====================
+    const EXAM_QUESTIONS = [
+      { id: 1, lec: 2, q: "بماذا يُرسم الكيان الضعيف (Weak Entity) في مخطط ERD؟", opts: ["مستطيل مفرد", "مستطيل مزدوج", "معين مزدوج", "بيضوي مزدوج"], ans: 1, exp: "الكيان الضعيف يرسم بمستطيل مزدوج، وعلاقته التعريفية بمعين مزدوج." },
+      { id: 2, lec: 2, q: "كيف نُمثّل الصفة المشتقة (Derived Attribute) مثل عدد موظفي القسم؟", opts: ["بيضوي مزدوج", "بيضوي متقطع (منقط)", "بيضوي تحته خط متصل", "مستطيل مفرد"], ans: 1, exp: "الصفة المشتقة ترسم بشكل بيضوي متقطع لأنها تحسب ولا تخزن." },
+      { id: 3, lec: 2, q: "ما معنى وجود خط مزدوج يصل بين الكيان E2 والعلاقة R في مخطط ERD؟", opts: ["مشاركة جزئية لـ E2 في R", "مشاركة كلية (Total Participation) لـ E2 في R", "أن E2 صفة متعددة القيم", "أن العلاقة 1:1 دائماً"], ans: 1, exp: "الخط المزدوج يمثل المشاركة الكلية الإلزامية (Total Participation)." },
+      { id: 4, lec: 2, q: "في مخطط الشركة، أين توضع صفة عدد الساعات (Hours) التي يعملها الموظف في المشروع؟", opts: ["على كيان Employee", "على كيان Project", "على علاقة Works-on (M:N)", "على علاقة Control"], ans: 2, exp: "توضع Hours على علاقة Works-on لأنها تتحدد لكل موظف في كل مشروع يعمل عليه." },
+      { id: 5, lec: 2, q: "في القيد الهيكلي (min, max) على مشاركة الكيان E في العلاقة R، متى تكون المشاركة كلية (Total)؟", opts: ["عندما يكون min = 0", "عندما يكون min >= 1", "عندما يكون max = N", "عندما يكون min = max = 0"], ans: 1, exp: "وجود min >= 1 يعني أن كل عنصر في E يجب أن يشارك مرة واحدة على الأقل." },
+      { id: 6, lec: 2, q: "في وظيفة مدينة السكن الجامعي، لكل مبنى مهندس صيانة وحيد بينما المهندس يشرف على أكثر من مبنى. ما التعددية؟", opts: ["1:1", "1:N (المهندس 1 والمبنى N)", "M:N", "1:N (المبنى 1 والمهندس N)"], ans: 1, exp: "المهندس الواحد يشرف على عدة أبنية، إذن المهندس جهة 1 والمبنى جهة N." },
+      { id: 7, lec: 3, q: "عند تحويل علاقة ثنائية 1:1 بأسلوب المفتاح الأجنبي، أي الكيانين يفضّل اختياره ليأخذ المفتاح الأجنبي (دور S)؟", opts: ["الكيان صاحب المشاركة الجزئية", "الكيان الذي يملك مشاركة كلية (Total Participation) في العلاقة", "الكيان الذي يحوي صفات أقل", "ننشئ جدولاً ثالثاً دائماً"], ans: 1, exp: "نختار الكيان صاحب المشاركة الكلية ليؤدي دور S وندرج فيه المفتاح الأجنبي لتفادي قيم NULL." },
+      { id: 8, lec: 3, q: "عند تحويل علاقة ثنائية 1:N، أين ندرج المفتاح الأجنبي؟", opts: ["في الكيان الموجود في جهة 1", "في الكيان الموجود في جهة N (الذي يمثل S)", "في جدول جديد منفصل", "نحذف المفتاح الأساسي"], ans: 1, exp: "في 1:N تمثل S الكيان في جهة N، فندرج المفتاح الأساسي للكيان T (جهة 1) داخل S كمفتاح أجنبي." },
+      { id: 9, lec: 3, q: "كيف يتم تحويل علاقة ثنائية من النوع M:N (مثل Works-on) إلى النموذج العلائقي؟", opts: ["نضع مفتاح الأول في الثاني فقط", "ننشئ علاقة (جدول) جديدة S مفتاحها الأساسي هو اجتماع المفاتيح الأجنبية للكيانات المشاركة", "نحولها لصفة مشتقة", "ندمج الجدولين في جدول واحد"], ans: 1, exp: "الخطوة 5: ننشئ علاقة جديدة S تضم مفاتيح الكيانات المشاركة كمفاتيح أجنبية واجتماعها يشكل الـ Primary Key." },
+      { id: 10, lec: 3, q: "ما هو المفتاح الأساسي للعلاقة الجديدة R الناتجة عن تحويل صفة متعددة القيم A يملكها كيان مفتاحه الأساسي K؟", opts: ["K فقط", "A فقط", "تركيب (A و K) معاً، حيث K مفتاح أجنبي", "رقم تسلسلي عشوائي"], ans: 2, exp: "الخطوة 6: المفتاح الأساسي للعلاقة الجديدة R هو تركيب A و K (مثل DNUMBER + DLOCATION)." },
+      { id: 11, lec: 3, q: "أي من الجداول التالية في المخطط العلائقي للشركة يملك مفتاحاً أساسياً مركباً؟", opts: ["EMPLOYEE و DEPARTMENT", "PROJECT فقط", "WORKS_ON و DEPT_LOCATIONS و DEPENDENT", "DEPARTMENT و PROJECT"], ans: 2, exp: "الجداول الثلاثة ذات المفتاح المركب هي: DEPT_LOCATIONS، و WORKS_ON، و DEPENDENT." },
+      { id: 12, lec: 4, q: "ماذا يقابل النوع decimal(p,s) والنوع bit عند التحويل من SQL Server إلى PostgreSQL / pgAdmin؟", opts: ["integer و char", "numeric (مع ضبط Precision و Scale) و boolean", "character varying و date", "timestamp و text"], ans: 1, exp: "decimal يقابله numeric، و bit يقابله boolean (قيم منطقية true/false)." },
+      { id: 13, lec: 4, q: "لماذا نختار للـ (SSN, MGRSSN, SUPERSSN, ESSN) النوع character varying(9) بدلاً من integer في PostgreSQL؟", opts: ["لأن integer غير موجود في PostgreSQL", "لأنها معرّفات وليست أرقاماً للحساب وقد تبدأ بصفر، ويجب تطابق النوع في PK و FK", "لأنها تقبل فواصل عشرية", "لتقليل عدد الجداول"], ans: 1, exp: "لأنها معرّفات (Identifiers) قد تبدأ بصفر، ولا نجري عليها عمليات حسابية." },
+      { id: 14, lec: 4, q: "ما هو سبب تأجيل إضافة قيد Foreign Key للعمود department.mgrssn إلى ما بعد إدخال الموظفين؟", opts: ["لأن جدول department لا يقبل مفاتيح أجنبية", "بسبب وجود اعتماد دائري (Circular Reference) بين DEPARTMENT و EMPLOYEE", "لأن mgrssn مفتاح أساسي", "لأن pgAdmin لا يدعم العلاقات"], ans: 1, exp: "بسبب الاعتماد الدائري بين الجدولين؛ ندخل الأقسام بمدير [null] ثم الموظفين ثم نحدث المدير ونضيف القيد." },
+      { id: 15, lec: 4, q: "في جدول EMPLOYEE، ما هو الترتيب الصحيح لإدخال الموظفين بسبب قيد الإشراف الذاتي (superssn)؟", opts: ["ندخل John ثم Alicia ثم James", "ندخل James أولاً (لأنه بلا مشرف [null])، ثم Franklin و Jennifer، ثم بقية الموظفين", "الترتيب غير مهم أبداً", "ندخل الموظفين حسب الراتب التصاعدي"], ans: 1, exp: "يجب إدخال المشرف قبل الموظف الذي يشير إليه، فنبدأ بـ James لأن superssn له [null]." },
+      { id: 16, lec: 4, q: "كيف ننشئ مفتاحاً أساسياً مركباً (Composite PK) لجدول works_on في واجهة pgAdmin 4؟", opts: ["نفعّل Primary Key لكل عمود منفرداً في تبويب Columns", "لا نفعّل PK منفرداً في Columns، بل ننشئ قيد Primary Key واحداً من تبويب Constraints يضم العمودين (essn, pno) معاً", "ننشئ Foreign Key فقط", "نكتب الكلمتين في عمود واحد"], ans: 1, exp: "في pgAdmin يتم إنشاء المفتاح المركب عبر قيد Primary Key واحد في تبويب Constraints." },
+      { id: 17, lec: 5, q: "إلى أي فئة تنتمي الأوامر (Delete, Insert, Update) وإلى أي فئة ينتمي الأمر (Select)؟", opts: ["كلاهما DDL", "Delete/Insert/Update تنتمي لـ DML، بينما Select تنتمي لـ DQL", "Delete/Insert/Update تنتمي لـ DCL، و Select تنتمي لـ DML", "كلاهما DCL"], ans: 1, exp: "DML هي لغة معالجة البيانات (Insert, Update, Delete)، و DQL هي لغة الاستعلام (Select)." },
+      { id: 18, lec: 5, q: "إلى أي فئة ينتمي الأمران (Grant, Revoke) وما وظيفتهما؟", opts: ["DDL للتعامل مع بنية القاعدة", "DCL (Data Control Language) لمنح وسحب السماحيات", "DML لتعديل السجلات", "DQL للاستعلام"], ans: 1, exp: "Grant و Revoke هما أوامر لغة التحكم بالبيانات DCL لمنح وسحب الصلاحيات." },
+      { id: 19, lec: 5, q: "أين توضع الكلمة المفتاحية DISTINCT في جملة الاستعلام وما وظيفتها؟", opts: ["في نهاية الجملة لترتيب السجلات", "مباشرة بعد كلمة SELECT للتخلص من السجلات المتكررة", "بعد كلمة WHERE لفلترة القيم الخالية", "بعد GROUP BY"], ans: 1, exp: "توضع DISTINCT مباشرة بعد SELECT لحذف السجلات المتكررة، والحالة الافتراضية هي ALL." },
+      { id: 20, lec: 5, q: "في المعامل LIKE، ماذا يمثل الرمز ( _ ) وماذا يمثل الرمز ( % )؟", opts: ["كلاهما يمثل محرفاً واحداً", "_ يدل على وجود محرف واحد فقط، بينما % يدل على وجود عدة محارف", "_ يدل على عدة محارف، و % لمحرف واحد", "_ للأرقام فقط"], ans: 1, exp: "الشرطة السفلية _ تمثل محرفاً واحداً بالضبط، والنسبة المئوية % تمثل سلسلة من المحارف." },
+      { id: 21, lec: 5, q: "كيف نكتب شرطاً في WHERE لاختيار الموظفين الذين لا نعرف عنوانهم؟", opts: ["WHERE address = 'NULL'", "WHERE address = NULL", "WHERE address IS NULL", "WHERE NOT address"], ans: 2, exp: "لفحص القيمة الخالية NULL نستخدم حصراً المعامل IS NULL (أو IS NOT NULL)." },
+      { id: 22, lec: 5, q: "كيف نعبر عن التعليق لسطر واحد ولعدة أسطر في SQL، وكيف نكتب اسماً مستعاراً يحوي فراغاً؟", opts: ["// للسطر و # للعدة أسطر، وعلامتي تنصيص للفراغ", "(--) لتعليق سطر، و (/* */) لعدة أسطر، ونضع الاسم الذي يحوي فراغاً بين قوسين مربعين [ ]", "<!-- --> للتعليق", "** للتعليق"], ans: 1, exp: "كما ورد في ملاحظات المحاضرة الخامسة: (--) لسطر، (/* */) لعدة أسطر، و [ ] للاسم الذي يحوي فراغاً." },
+      { id: 23, lec: 6, q: "عند استخدام عبارة GROUP BY، ما هو الشرط الإلزامي لكل عمود يوضع في قائمة SELECT؟", opts: ["أن يكون مفتاحاً أساسياً فقط", "أن يكون إما مطبقاً عليه تابع تجميع أو جزءاً من عبارة GROUP BY", "أن يكون له اسم مستعار", "أن يكون من نوع numeric"], ans: 1, exp: "كل عمود في قائمة SELECT مع GROUP BY يجب أن يكون إما مجمّعاً أو مذكوراً في GROUP BY." },
+      { id: 24, lec: 6, q: "متى نستخدم عبارة HAVING بدلاً من WHERE؟", opts: ["قبل كلمة FROM", "عندما نضع شرطاً على قيم التجميع (مثل HAVING AVG(hours) > 5)", "عند ترتيب النتائج تنازلياً", "مع المعامل LIKE فقط"], ans: 1, exp: "تُستخدم HAVING حصراً لفرض شروط على نتائج توابع التجميع بعد GROUP BY." },
+      { id: 25, lec: 6, q: "كيف نحصل على عدد القيم غير المكررة في عمود معين باستخدام تابع التجميع COUNT؟", opts: ["COUNT(*) DISTINCT", "COUNT(DISTINCT [col_name])", "DISTINCT(COUNT(*))", "SUM(DISTINCT col_name)"], ans: 1, exp: "نضع كلمة DISTINCT داخل أقواس التابع قبل اسم العمود: COUNT(DISTINCT [col_name])." },
+      { id: 26, lec: 6, q: "ما هي الدالة التي تعيد الفرق الرقمي بين تاريخين في SQL Server؟", opts: ["DATEPART", "DATENAME", "DATEDIFF(date_part, start_date, end_date)", "GETDATE()"], ans: 2, exp: "الدالة DATEDIFF تحسب الفرق بين تاريخين (أيام، أشهر، سنوات...) حسب قيمة date_part." },
+      { id: 27, lec: 6, q: "في دوال التاريخ، ما هو الاختصار الصحيح للربع (Quarter) ولليوم من السنة (Dayofyear) وللدقيقة (Minute)؟", opts: ["qr و dy و mm", "qq أو q للربع، و dy أو y لليوم من السنة، و mi أو n للدقيقة (بينما mm هي للشهر!)", "qu و da و mn", "yy و mm و dd"], ans: 1, exp: "انتبه: mm هي للشهر (Month)، بينما الدقيقة (Minute) اختصارها mi أو n!" },
+      { id: 28, lec: 6, q: "ما هي الوظيفة الدقيقة للدالتين ASCII('a') و CHAR(65)؟", opts: ["كلاهما يحول لأحرف كبيرة", "ASCII('a') تعيد رقم ترميز الآسكي للمحرف (97)، و CHAR(65) تعيد المحرف المقابل لرقم الآسكي ('A')", "تقتطع جزءاً من السلسلة", "تحول الرقم إلى نص"], ans: 1, exp: "ASCII تأخذ محرفاً وتعيد رقمه، و CHAR تأخذ رقماً وتعيد المحرف الموافق له." },
+      { id: 29, lec: 6, q: "ما هو ناتج تنفيذ الدالتين: LEFT('abcdef', 2) و RIGHT('abcd', 3)؟", opts: ["'ef' و 'abc'", "'ab' و 'bcd'", "'abc' و 'd'", "'cd' و 'ab'"], ans: 1, exp: "LEFT تقتطع حرفين من اليسار ('ab')، و RIGHT تقتطع 3 أحرف من اليمين ('bcd')." },
+      { id: 30, lec: 6, q: "ماذا يفعل الاستعلام: SELECT ISNULL(address, 0) FROM EMPLOYEE ولماذا نضع التاريخ بصيغة '19900101'؟", opts: ["يحذف العناوين الفارغة", "يفحص address فإذا كان NULL يعيد 0 وإلا يعيد العنوان نفسه؛ والتاريخ يوضع بين إشارتي تنصيص بلا فواصل للمقارنة", "يجعل كل العناوين أصفاراً", "يحسب طول العنوان"], ans: 1, exp: "ISNULL يستبدل القيمة الخالية بالوسيط الثاني، وتمرير التاريخ للمقارنة في SQL Server يكتب بلا فواصل مثل '19900101'." }
+    ];
+
+    // ==================== APP STATE ====================
+    let state = {
+      currentStationIdx: 0,
+      completedStations: [],
+      xp: 0,
+      sidebarFilter: 'all',
+      stationQuizAnswers: {},
+      activeSqlExId: 1,
+      sqlFilter: 'all',
+      examFilter: 'all',
+      examAnswers: {},
+      attrDemoIdx: 0,
+      relDemoCard: '1:N',
+      relDemoPart: 'total',
+      hwTab: 'company',
+      schemaFkIdx: 0,
+      likePattern: "h%",
+      funcDemoType: "substring"
+    };
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem("db1_homs_academy_state_v1");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          state = { ...state, ...parsed };
+        }
+      } catch (e) {}
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem("db1_homs_academy_state_v1", JSON.stringify({
+          currentStationIdx: state.currentStationIdx,
+          completedStations: state.completedStations,
+          xp: state.xp,
+          stationQuizAnswers: state.stationQuizAnswers,
+          examAnswers: state.examAnswers
+        }));
+      } catch (e) {}
+    }
+
+    function showToast(msg, type = "success") {
+      const box = document.getElementById("toast-box");
+      if (!box) return;
+      box.textContent = msg;
+      box.className = "fixed bottom-5 left-5 z-50 max-w-sm rounded-xl px-4 py-3 shadow-2xl border text-sm font-bold transition-all duration-300 " +
+        (type === "success"
+          ? "bg-emerald-950/95 border-emerald-500 text-emerald-200"
+          : "bg-amber-950/95 border-amber-500 text-amber-200");
+      setTimeout(() => {
+        box.classList.add("hidden");
+      }, 3200);
+    }
+
+    function updateHeaderProgress() {
+      const doneCount = state.completedStations.length;
+      const pct = Math.round((doneCount / STATIONS.length) * 100);
+      document.getElementById("progress-bar").style.width = pct + "%";
+      document.getElementById("progress-text").textContent = `${doneCount} / ${STATIONS.length} محطة (${pct}%)`;
+      document.getElementById("xp-display").textContent = `${state.xp} XP`;
+
+      let rank = "مبتدئ طموح 🌱";
+      if (doneCount >= 4) rank = "مهندس مخططات ERD 📐";
+      if (doneCount >= 8) rank = "محترف Mapping 🔗";
+      if (doneCount >= 10) rank = "مدير قواعد pgAdmin 🛠️";
+      if (doneCount >= 14) rank = "محلل استعلامات SQL ⚡";
+      if (doneCount === 16) rank = "ماستر قواعد معطيات 1 🏆";
+      document.getElementById("rank-badge").textContent = "الرتبة: " + rank;
+    }
+
+    // ==================== MAIN TABS ====================
+    function switchMainTab(tab) {
+      ["learn", "sqllab", "exam", "cheat"].forEach(t => {
+        const view = document.getElementById("view-" + t);
+        const btn = document.getElementById("tab-btn-" + t);
+        if (t === tab) {
+          view.classList.remove("hidden");
+          btn.className = "px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold whitespace-nowrap transition-all bg-sky-600 text-white shadow";
+        } else {
+          view.classList.add("hidden");
+          btn.className = "px-3.5 py-1.5 rounded-lg text-xs md:text-sm font-bold whitespace-nowrap transition-all bg-slate-800 text-slate-300 hover:bg-slate-700";
+        }
+      });
+      if (tab === "sqllab") {
+        renderSqlLab();
+      } else if (tab === "exam") {
+        renderExam();
+      }
+    }
+
+    // ==================== SIDEBAR & STATION RENDERING ====================
+    function filterSidebar(lec) {
+      state.sidebarFilter = lec;
+      ["all", 2, 3, 4, 5, 6].forEach(k => {
+        const b = document.getElementById("filt-" + k);
+        if (b) {
+          b.className = (k === lec)
+            ? "px-2 py-0.5 rounded text-[11px] font-bold bg-sky-600 text-white"
+            : "px-2 py-0.5 rounded text-[11px] font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+        }
+      });
+      renderSidebar();
+    }
+
+    function renderSidebar() {
+      const container = document.getElementById("stations-list");
+      let html = "";
+      STATIONS.forEach((st, idx) => {
+        if (state.sidebarFilter !== "all" && st.lecture !== state.sidebarFilter) return;
+        const isCurrent = idx === state.currentStationIdx;
+        const isDone = state.completedStations.includes(st.id);
+        let cls = "w-full text-right p-2.5 rounded-xl border transition-all flex items-center justify-between gap-2 ";
+        if (isCurrent) cls += "step-active ";
+        else if (isDone) cls += "step-done text-slate-200 hover:bg-emerald-950/30 ";
+        else cls += "bg-slate-900/70 border-slate-800 text-slate-300 hover:bg-slate-800/80 ";
+
+        html += `
+          <button onclick="selectStation(${idx})" class="${cls}">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="w-6 h-6 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${isCurrent ? 'bg-white text-sky-700' : isDone ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-400'}">
+                ${isDone ? '✓' : st.id}
+              </span>
+              <div class="truncate">
+                <div class="text-xs font-bold truncate">${st.title}</div>
+                <div class="text-[10px] ${isCurrent ? 'text-sky-100' : 'text-slate-400'}">المحاضرة ${st.lecture} عملي</div>
+              </div>
+            </div>
+          </button>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    function selectStation(idx) {
+      state.currentStationIdx = idx;
+      saveState();
+      renderSidebar();
+      renderCurrentStation();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderCurrentStation() {
+      const st = STATIONS[state.currentStationIdx];
+      const isDone = state.completedStations.includes(st.id);
+      const container = document.getElementById("station-container");
+
+      let conceptsHtml = st.concepts.map(c => `
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
+          <h4 class="text-sm font-extrabold text-sky-400 mb-1.5">${c.title}</h4>
+          <div class="text-xs md:text-sm text-slate-200 leading-relaxed">${c.body}</div>
+        </div>
+      `).join("");
+
+      let quizHtml = st.quizzes.map((qz, qIdx) => {
+        const key = `${st.id}_${qIdx}`;
+        const picked = state.stationQuizAnswers[key];
+        const optsHtml = qz.options.map((opt, oIdx) => {
+          let btnCls = "w-full text-right px-3.5 py-2.5 rounded-xl border text-xs md:text-sm font-semibold transition-all flex items-center justify-between ";
+          if (picked === undefined) {
+            btnCls += "bg-slate-900/80 border-slate-700 hover:border-sky-500 text-slate-200";
+          } else if (oIdx === qz.ans) {
+            btnCls += "bg-emerald-950/90 border-emerald-500 text-emerald-200 font-bold";
+          } else if (picked === oIdx) {
+            btnCls += "bg-rose-950/90 border-rose-500 text-rose-200";
+          } else {
+            btnCls += "bg-slate-900/40 border-slate-800 text-slate-500";
+          }
+          return `
+            <button onclick="answerStationQuiz(${st.id}, ${qIdx}, ${oIdx})" class="${btnCls}">
+              <span>${opt}</span>
+              <span>${picked !== undefined && oIdx === qz.ans ? '✅' : picked === oIdx && oIdx !== qz.ans ? '❌' : ''}</span>
+            </button>
+          `;
+        }).join("");
+
+        return `
+          <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-2.5">
+            <div class="text-xs md:text-sm font-bold text-white">سؤال ${qIdx + 1}: ${qz.q}</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">${optsHtml}</div>
+            ${picked !== undefined ? `
+              <div class="text-xs p-2.5 rounded-lg border ${picked === qz.ans ? 'bg-emerald-950/50 border-emerald-700 text-emerald-300' : 'bg-amber-950/50 border-amber-700 text-amber-300'}">
+                <strong>التوضيح:</strong> ${qz.exp}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join("");
+
+      container.innerHTML = `
+        <!-- Station Header -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-slate-800">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-sky-500/20 text-sky-300 border border-sky-500/30">المحطة ${st.id} من ${STATIONS.length}</span>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">المحاضرة ${st.lecture} عملي</span>
+              ${isDone ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">مكتملة ✓</span>' : ''}
+            </div>
+            <h2 class="text-lg md:text-xl font-black text-white">${st.title}</h2>
+            <p class="text-xs text-slate-400">${st.subtitle}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="prevStation()" ${state.currentStationIdx === 0 ? 'disabled' : ''} class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold hover:bg-slate-700 disabled:opacity-40">➡ السابقة</button>
+            <button onclick="nextStation()" ${state.currentStationIdx === STATIONS.length - 1 ? 'disabled' : ''} class="px-3.5 py-1.5 rounded-xl bg-sky-600 text-white text-xs font-bold hover:bg-sky-500 disabled:opacity-40">التالية ⬅</button>
+          </div>
+        </div>
+
+        <!-- Intro Story -->
+        <div class="my-4 p-3.5 rounded-xl bg-gradient-to-l from-sky-950/60 to-slate-900 border border-sky-800/50 text-xs md:text-sm text-sky-100 leading-relaxed">
+          💡 <strong>الفكرة ببساطة:</strong> ${st.intro}
+        </div>
+
+        <!-- Step-by-Step Concepts -->
+        <div class="space-y-3 mb-5">
+          ${conceptsHtml}
+        </div>
+
+        <!-- Interactive Visual Playground for this Station -->
+        <div class="mb-5 bg-slate-950 border border-sky-500/30 rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs md:text-sm font-extrabold text-sky-400">🎨 الرسم والمحاكي التفاعلي للمحطة (جرب بنفسك!):</span>
+            <span class="text-[11px] text-slate-400">انقر على الأزرار داخل الرسم للتفاعل</span>
+          </div>
+          <div id="station-visual-box">${renderVisualWidget(st.visualType)}</div>
+        </div>
+
+        <!-- Exam Trap Callout -->
+        <div class="mb-5 p-4 rounded-xl bg-amber-950/40 border border-amber-500/50 border-r-4 border-r-amber-500">
+          <div class="text-xs md:text-sm font-extrabold text-amber-400 mb-1">⚠️ نكشة الفحص (انتبه جداً!):</div>
+          <p class="text-xs md:text-sm text-amber-100 leading-relaxed">${st.trap}</p>
+        </div>
+
+        <!-- Station Checkpoint Quizzes -->
+        <div class="space-y-3 pt-3 border-t border-slate-800">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm md:text-base font-extrabold text-emerald-400">🎯 تحدي المحطة ${st.id}: أجب لترفع نقاطك وتنتقل للمحطة التالية!</h3>
+            <button onclick="markStationComplete(${st.id})" class="px-3 py-1 rounded-lg text-xs font-bold ${isDone ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/30' : 'bg-emerald-600 text-white hover:bg-emerald-500'}">
+              ${isDone ? 'تم إتقان المحطة ✓' : 'تأكيد إتمام المحطة +50 XP'}
+            </button>
+          </div>
+          ${quizHtml}
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
+          <button onclick="prevStation()" ${state.currentStationIdx === 0 ? 'disabled' : ''} class="px-4 py-2 rounded-xl bg-slate-800 text-slate-200 text-xs md:text-sm font-bold hover:bg-slate-700 disabled:opacity-40">
+            ➡ المحطة السابقة
+          </button>
+          <button onclick="completeAndNext(${st.id})" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-sky-600 text-white text-xs md:text-sm font-extrabold shadow-lg hover:opacity-95">
+            ${state.currentStationIdx === STATIONS.length - 1 ? '🎉 إتمام الرحلة والانتقال لمختبر SQL!' : 'فهمتها 100% — انتقل للمحطة التالية ⬅'}
+          </button>
+        </div>
+      `;
+    }
+
+    function answerStationQuiz(stId, qIdx, oIdx) {
+      const st = STATIONS.find(s => s.id === stId);
+      const key = `${stId}_${qIdx}`;
+      const wasAnswered = state.stationQuizAnswers[key] !== undefined;
+      state.stationQuizAnswers[key] = oIdx;
+
+      if (!wasAnswered && oIdx === st.quizzes[qIdx].ans) {
+        state.xp += 25;
+        showToast("إجابة صحيحة! ربحت +25 XP 🎉", "success");
+      } else if (oIdx !== st.quizzes[qIdx].ans) {
+        showToast("راجع التوضيح أسفل السؤال لتثبيت الفكرة 💡", "warn");
+      }
+
+      // Check if all quizzes in this station are answered correctly
+      const allCorrect = st.quizzes.every((q, idx) => state.stationQuizAnswers[`${stId}_${idx}`] === q.ans);
+      if (allCorrect && !state.completedStations.includes(stId)) {
+        state.completedStations.push(stId);
+        state.xp += 50;
+        showToast(`أكملت المحطة ${stId} بنجاح! +50 XP 🏆`, "success");
+      }
+      saveState();
+      updateHeaderProgress();
+      renderSidebar();
+      renderCurrentStation();
+    }
+
+    function markStationComplete(stId) {
+      if (!state.completedStations.includes(stId)) {
+        state.completedStations.push(stId);
+        state.xp += 50;
+        saveState();
+        updateHeaderProgress();
+        renderSidebar();
+        renderCurrentStation();
+        showToast(`تم تسجيل المحطة ${stId} كمكتملة! +50 XP`, "success");
+      }
+    }
+
+    function completeAndNext(stId) {
+      markStationComplete(stId);
+      if (state.currentStationIdx < STATIONS.length - 1) {
+        selectStation(state.currentStationIdx + 1);
+      } else {
+        switchMainTab("sqllab");
+      }
+    }
+
+    function prevStation() {
+      if (state.currentStationIdx > 0) selectStation(state.currentStationIdx - 1);
+    }
+    function nextStation() {
+      if (state.currentStationIdx < STATIONS.length - 1) selectStation(state.currentStationIdx + 1);
+    }
+
+    function resetAllProgress() {
+      state.completedStations = [];
+      state.xp = 0;
+      state.stationQuizAnswers = {};
+      state.currentStationIdx = 0;
+      saveState();
+      updateHeaderProgress();
+      renderSidebar();
+      renderCurrentStation();
+      showToast("تم تصفير التقدم للبدء من جديد.", "warn");
+    }
+
+    // ==================== INTERACTIVE VISUAL WIDGETS FOR STATIONS ====================
+    function renderVisualWidget(type) {
+      if (type === "entity_compare") {
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div class="bg-slate-900 p-4 rounded-xl border border-sky-500/40 text-center">
+              <div class="text-xs font-bold text-sky-400 mb-2">كيان قوي (Regular / Strong Entity)</div>
+              <svg class="mx-auto" width="240" height="90" viewBox="0 0 240 90">
+                <rect x="50" y="25" width="140" height="45" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5" rx="4"/>
+                <text x="120" y="52" text-anchor="middle" fill="#f8fafc" font-size="15" font-weight="bold" font-family=" monospace">EMPLOYEE</text>
+              </svg>
+              <p class="text-xs text-slate-300 mt-1">مستطيل مفرد — مستقل بذاته ويملك مفتاحاً أساسياً <span class="mono-ltr text-sky-300">SSN</span></p>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-xl border border-amber-500/40 text-center">
+              <div class="text-xs font-bold text-amber-400 mb-2">كيان ضعيف (Weak Entity) + علاقة تعريفية</div>
+              <svg class="mx-auto" width="280" height="90" viewBox="0 0 280 90">
+                <polygon points="65,12 120,45 65,78 10,45" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
+                <polygon points="65,19 110,45 65,71 20,45" fill="#0f172a" stroke="#f59e0b" stroke-width="1.8"/>
+                <text x="65" y="48" text-anchor="middle" fill="#fde68a" font-size="9" font-weight="bold">Dependents-OF</text>
+                <line x1="120" y1="42" x2="155" y2="42" stroke="#f59e0b" stroke-width="2"/>
+                <line x1="120" y1="48" x2="155" y2="48" stroke="#f59e0b" stroke-width="2"/>
+                <rect x="155" y="20" width="115" height="50" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
+                <rect x="161" y="26" width="103" height="38" fill="#0f172a" stroke="#f59e0b" stroke-width="1.8"/>
+                <text x="212" y="49" text-anchor="middle" fill="#fef3c7" font-size="13" font-weight="bold">Dependent</text>
+              </svg>
+              <p class="text-xs text-slate-300 mt-1">مستطيل مزدوج + معين مزدوج + خط مزدوج (مشاركة كلية دائماً!)</p>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "attribute_explorer") {
+        const attrs = [
+          { name: "1. صفة بسيطة (Simple)", en: "Simple Attribute", desc: "بيضوي مفرد — قيمة واحدة غير قابلة للتجزئة مثل Salary و Sex.", svg: `<svg width="240" height="80" viewBox="0 0 240 80"><line x1="20" y1="40" x2="70" y2="40" stroke="#38bdf8" stroke-width="2"/><ellipse cx="140" cy="40" rx="65" ry="24" fill="#0f172a" stroke="#38bdf8" stroke-width="2.2"/><text x="140" y="45" text-anchor="middle" fill="#fff" font-size="14" font-weight="bold">Salary</text></svg>` },
+          { name: "2. صفة مفتاحية (Key)", en: "Key Attribute (Primary Key)", desc: "بيضوي تحته خط متصل — قيمة فريدة لا تتكرر مثل SSN للموظف.", svg: `<svg width="240" height="80" viewBox="0 0 240 80"><line x1="20" y1="40" x2="70" y2="40" stroke="#10b981" stroke-width="2"/><ellipse cx="140" cy="40" rx="65" ry="24" fill="#0f172a" stroke="#10b981" stroke-width="2.2"/><text x="140" y="43" text-anchor="middle" fill="#6ee7b7" font-size="15" font-weight="bold">SSN</text><line x1="110" y1="50" x2="170" y2="50" stroke="#6ee7b7" stroke-width="2.5"/></svg>` },
+          { name: "3. مفتاح جزئي (Partial Key)", en: "Partial Key (Weak Entity)", desc: "بيضوي تحته خط متقطع (منقط) — يميز الكيان الضعيف بمساعدة مفتاح المالك (مثل Name في Dependent).", svg: `<svg width="240" height="80" viewBox="0 0 240 80"><line x1="20" y1="40" x2="70" y2="40" stroke="#f59e0b" stroke-width="2"/><ellipse cx="140" cy="40" rx="65" ry="24" fill="#0f172a" stroke="#f59e0b" stroke-width="2.2"/><text x="140" y="43" text-anchor="middle" fill="#fde68a" font-size="14" font-weight="bold">Name</text><line x1="108" y1="50" x2="172" y2="50" stroke="#fde68a" stroke-width="2.2" stroke-dasharray="5,3"/></svg>` },
+          { name: "4. متعددة القيم (Multivalued)", en: "Multivalued Attribute", desc: "بيضوي مزدوج — تقبل أكثر من قيمة لنفس الكيان مثل Location للقسم (وستتحول لجدول جديد!).", svg: `<svg width="240" height="80" viewBox="0 0 240 80"><line x1="20" y1="40" x2="65" y2="40" stroke="#ec4899" stroke-width="2"/><ellipse cx="140" cy="40" rx="70" ry="27" fill="#0f172a" stroke="#ec4899" stroke-width="2"/><ellipse cx="140" cy="40" rx="62" ry="20" fill="#0f172a" stroke="#ec4899" stroke-width="1.8"/><text x="140" y="45" text-anchor="middle" fill="#fbcfe8" font-size="13" font-weight="bold">Location</text></svg>` },
+          { name: "5. صفة مركبة (Composite)", en: "Composite Attribute", desc: "بيضوي يتفرع لعدة صفات بسيطة مثل Name(FName, Minit, LName). عند التحويل نأخذ الفروع فقط!", svg: `<svg width="260" height="90" viewBox="0 0 260 90"><ellipse cx="130" cy="68" rx="45" ry="15" fill="#0f172a" stroke="#a855f7" stroke-width="2"/><text x="130" y="73" text-anchor="middle" fill="#e9d5ff" font-size="11">Name</text><line x1="105" y1="55" x2="55" y2="32" stroke="#a855f7" stroke-width="1.5"/><line x1="130" y1="53" x2="130" y2="32" stroke="#a855f7" stroke-width="1.5"/><line x1="155" y1="55" x2="205" y2="32" stroke="#a855f7" stroke-width="1.5"/><ellipse cx="50" cy="20" rx="35" ry="12" fill="#0f172a" stroke="#a855f7" stroke-width="1.8"/><text x="50" y="24" text-anchor="middle" fill="#fff" font-size="10">FName</text><ellipse cx="130" cy="20" rx="30" ry="12" fill="#0f172a" stroke="#a855f7" stroke-width="1.8"/><text x="130" y="24" text-anchor="middle" fill="#fff" font-size="10">Minit</text><ellipse cx="210" cy="20" rx="35" ry="12" fill="#0f172a" stroke="#a855f7" stroke-width="1.8"/><text x="210" y="24" text-anchor="middle" fill="#fff" font-size="10">LName</text></svg>` },
+          { name: "6. صفة مشتقة (Derived)", en: "Derived Attribute", desc: "بيضوي متقطع (منقط) — تحسب قيمتها وقت التنفيذ ولا تخزن في الجداول مثل Number-of-employees.", svg: `<svg width="250" height="80" viewBox="0 0 250 80"><line x1="15" y1="40" x2="55" y2="40" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,3"/><ellipse cx="145" cy="40" rx="85" ry="24" fill="#0f172a" stroke="#38bdf8" stroke-width="2.2" stroke-dasharray="6,4"/><text x="145" y="44" text-anchor="middle" fill="#bae6fd" font-size="11" font-weight="bold">Number-of-employees</text></svg>` }
+        ];
+        const cur = attrs[state.attrDemoIdx] || attrs[0];
+        return `
+          <div class="space-y-3">
+            <div class="flex flex-wrap gap-1.5">
+              ${attrs.map((a, i) => `
+                <button onclick="setAttrDemo(${i})" class="px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${state.attrDemoIdx === i ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${a.name}</button>
+              `).join("")}
+            </div>
+            <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 flex flex-col md:flex-row items-center justify-around gap-4">
+              <div>${cur.svg}</div>
+              <div class="max-w-md space-y-1 text-right">
+                <div class="text-sm font-black text-amber-400 mono-ltr">${cur.en}</div>
+                <p class="text-xs md:text-sm text-slate-200">${cur.desc}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "relationship_sim") {
+        const isTotal = state.relDemoPart === "total";
+        return `
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex gap-1.5">
+                <button onclick="setRelDemo('1:1', '${state.relDemoPart}')" class="px-3 py-1 rounded-lg text-xs font-bold mono-ltr ${state.relDemoCard === '1:1' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300'}">1 : 1 (Manage)</button>
+                <button onclick="setRelDemo('1:N', '${state.relDemoPart}')" class="px-3 py-1 rounded-lg text-xs font-bold mono-ltr ${state.relDemoCard === '1:N' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300'}">1 : N (Control)</button>
+                <button onclick="setRelDemo('M:N', '${state.relDemoPart}')" class="px-3 py-1 rounded-lg text-xs font-bold mono-ltr ${state.relDemoCard === 'M:N' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300'}">M : N (Works-on)</button>
+              </div>
+              <div class="flex gap-1.5">
+                <button onclick="setRelDemo('${state.relDemoCard}', 'total')" class="px-3 py-1 rounded-lg text-xs font-bold ${isTotal ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-300'}">مشاركة كلية (خط مزدوج)</button>
+                <button onclick="setRelDemo('${state.relDemoCard}', 'partial')" class="px-3 py-1 rounded-lg text-xs font-bold ${!isTotal ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-300'}">مشاركة جزئية (خط مفرد)</button>
+              </div>
+            </div>
+            <div class="bg-slate-900 rounded-xl p-4 border border-slate-800 text-center">
+              <svg class="mx-auto max-w-full" width="440" height="85" viewBox="0 0 440 85">
+                <rect x="15" y="24" width="95" height="38" fill="#0f172a" stroke="#38bdf8" stroke-width="2"/>
+                <text x="62" y="47" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">E1</text>
+                <line x1="110" y1="43" x2="175" y2="43" stroke="#94a3b8" stroke-width="2"/>
+                <text x="142" y="34" text-anchor="middle" fill="#38bdf8" font-size="14" font-weight="bold">${state.relDemoCard.split(':')[0]}</text>
+                <polygon points="220,12 265,43 220,74 175,43" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
+                <text x="220" y="47" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">R</text>
+                ${isTotal ? `
+                  <line x1="264" y1="40" x2="330" y2="40" stroke="#10b981" stroke-width="2.2"/>
+                  <line x1="264" y1="46" x2="330" y2="46" stroke="#10b981" stroke-width="2.2"/>
+                ` : `
+                  <line x1="265" y1="43" x2="330" y2="43" stroke="#94a3b8" stroke-width="2"/>
+                `}
+                <text x="298" y="33" text-anchor="middle" fill="#10b981" font-size="14" font-weight="bold">${state.relDemoCard.split(':')[1]}</text>
+                <rect x="330" y="24" width="95" height="38" fill="#0f172a" stroke="#10b981" stroke-width="2"/>
+                <text x="377" y="47" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">E2</text>
+              </svg>
+              <p class="text-xs text-slate-300 mt-1">
+                التعددية الحالية: <strong class="text-sky-400 mono-ltr">${state.relDemoCard}</strong> | مشاركة <strong class="text-emerald-400">E2</strong> في العلاقة: <strong>${isTotal ? 'كلية إلزامية (Total Participation — خط مزدوج، القيد الهيكلي min >= 1)' : 'جزئية اختيارية (Partial Participation — خط مفرد، القيد الهيكلي min = 0)'}</strong>
+              </p>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "company_and_hw_tabs") {
+        const isComp = state.hwTab === "company";
+        return `
+          <div class="space-y-3">
+            <div class="flex gap-2">
+              <button onclick="setHwTab('company')" class="px-3 py-1.5 rounded-lg text-xs font-bold ${isComp ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300'}">مثال 1: مخطط الشركة (COMPANY)</button>
+              <button onclick="setHwTab('dorm')" class="px-3 py-1.5 rounded-lg text-xs font-bold ${!isComp ? 'bg-amber-600 text-white' : 'bg-slate-800 text-slate-300'}">مثال 2 (حل الوظيفة): مدينة السكن الجامعي</button>
+            </div>
+            ${isComp ? `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
+                  <div class="font-bold text-sky-400 mb-1">الكيانات الـ 4 في COMPANY:</div>
+                  <ul class="space-y-1 text-slate-300 list-disc pr-4">
+                    <li><strong>Employee:</strong> مفتاحه <u>SSN</u>، صفة مركبة Name(FName, Minit, LName)، وصفاته Address, Sex, Salary, BirthDate.</li>
+                    <li><strong>Department:</strong> مفتاحاه <u>Number</u> و <u>Name</u>، صفة متعددة القيم Location (مزدوج)، وصفة مشتقة Number-of-employees (منقط).</li>
+                    <li><strong>Project:</strong> مفتاحه <u>Number</u>، وصفاته Name, Location (مفردة).</li>
+                    <li><strong>Dependent:</strong> كيان ضعيف (مستطيل مزدوج)، مفتاحه الجزئي Name (خط منقط)، وصفاته Sex, Date, RelationShip.</li>
+                  </ul>
+                </div>
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
+                  <div class="font-bold text-emerald-400 mb-1">العلاقات الـ 6 في COMPANY:</div>
+                  <ul class="space-y-1 text-slate-300 list-disc pr-4">
+                    <li><strong>Works-For (1:N):</strong> القسم (1 كلي) يعمل فيه الموظفون (N كلي).</li>
+                    <li><strong>Manage (1:1):</strong> الموظف (1 جزئي) يدير القسم (1 كلي) + صفة Start-Work.</li>
+                    <li><strong>Supervision (1:N ذاتية):</strong> Supervisor (1 جزئي) يشرف على Supervise (N جزئي).</li>
+                    <li><strong>Control (1:N):</strong> القسم (1 جزئي) يشرف على المشاريع (N كلي).</li>
+                    <li><strong>Works-on (M:N):</strong> الموظف (N كلي) يعمل على المشروع (M كلي) + صفة Hours.</li>
+                    <li><strong>Dependents-OF (1:N تعريفية):</strong> الموظف (1 جزئي) يملك التابع (N كلي).</li>
+                  </ul>
+                </div>
+              </div>
+            ` : `
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                <div class="bg-slate-900 p-3 rounded-xl border border-amber-500/30">
+                  <div class="font-bold text-amber-400 mb-1">الكيانات الـ 5 في مدينة السكن الجامعي:</div>
+                  <ul class="space-y-1 text-slate-300 list-disc pr-4">
+                    <li><strong>الطالب (Student):</strong> <u>رقم الطالب</u>، اسم، تاريخ ولادة، عنوان، اختصاص.</li>
+                    <li><strong>الموظف (Employee):</strong> <u>رقم التأمين الاجتماعي</u>، اسم، مؤهل علمي، توصيف العمل، تاريخ بدء العمل، <strong>رقم الهاتف (متعددة القيم: أرضي وموبايل)</strong>.</li>
+                    <li><strong>المبنى (Building):</strong> <u>رقم المبنى</u>، عدد الغرف، عدد الطوابق.</li>
+                    <li><strong>القسط الشهري (Installment):</strong> كيان ضعيف (أو تابع للطالب): رقم القسط، القيمة، الشهر، السنة.</li>
+                    <li><strong>النشاط (Activity):</strong> <u>رقم النشاط</u>، اسم، رسم اشتراك، وقت محدد.</li>
+                  </ul>
+                </div>
+                <div class="bg-slate-900 p-3 rounded-xl border border-amber-500/30">
+                  <div class="font-bold text-emerald-400 mb-1">العلاقات الـ 4 في السكن الجامعي:</div>
+                  <ul class="space-y-1 text-slate-300 list-disc pr-4">
+                    <li><strong>يشرف على صيانة (1:N):</strong> مهندس الصيانة Employee (1 جزئي) يشرف على Building (N كلي لأن لكل مبنى مهندس وحيد).</li>
+                    <li><strong>يقيم في (1:N):</strong> Building (1) يقيم فيه Student (N) مع صفة <strong>رقم الغرفة (Room_No)</strong>.</li>
+                    <li><strong>يسدد قسط (1:N تعريفية):</strong> Student (1) يترتب عليه Installment (N كلي).</li>
+                    <li><strong>يشارك في نشاط (M:N):</strong> Student (M) يشترك في Activity (N).</li>
+                  </ul>
+                </div>
+              </div>
+            `}
+          </div>
+        `;
+      }
+
+      if (type === "mapping_step1_2") {
+        return `
+          <div class="space-y-3 text-xs">
+            <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800">
+              <div class="font-bold text-sky-400 mb-1.5">الخطوة 1: تحويل كيان EMPLOYEE القوي (تفكيك الصفة المركبة Name):</div>
+              <div class="mono-ltr bg-slate-950 p-2.5 rounded-lg border border-slate-700 text-slate-200">
+                EMPLOYEE ( FNAME, MINIT, LNAME, <span class="underline font-bold text-emerald-400">SSN</span>, BDATE, ADDRESS, SEX, SALARY )
+              </div>
+            </div>
+            <div class="bg-slate-900 p-3.5 rounded-xl border border-amber-500/40">
+              <div class="font-bold text-amber-400 mb-1.5">الخطوة 2: تحويل كيان DEPENDENT الضعيف (استعارة مفتاح المالك ESSN + المفتاح الجزئي):</div>
+              <div class="mono-ltr bg-slate-950 p-2.5 rounded-lg border border-amber-500/40 text-slate-200">
+                DEPENDENT ( <span class="underline font-bold text-amber-400">ESSN, DEPENDENT_NAME</span>, SEX, BDATE, RELATIONSHIP ) &nbsp;&larr; FK: ESSN &rarr; EMPLOYEE(SSN)
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "mapping_step3_4") {
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-900 p-3.5 rounded-xl border border-sky-500/30">
+              <div class="font-bold text-sky-400 mb-1">الخطوة 3 (علاقة 1:1 Manage):</div>
+              <p class="text-slate-300 mb-2">لأن <span class="mono-ltr text-amber-300">DEPARTMENT</span> يملك مشاركة كلية (خط مزدوج)، يلعب دور S ويستقبل المفتاح الأجنبي للمدير:</p>
+              <div class="mono-ltr bg-slate-950 p-2 rounded border border-slate-700 text-emerald-300">
+                DEPARTMENT ( DNAME, <u>DNUMBER</u>, <span class="text-amber-400">MGRSSN</span>, MGRSTARTDATE )
+              </div>
+            </div>
+            <div class="bg-slate-900 p-3.5 rounded-xl border border-emerald-500/30">
+              <div class="font-bold text-emerald-400 mb-1">الخطوة 4 (علاقات 1:N الثلاث):</div>
+              <p class="text-slate-300 mb-2">دائماً الكيان في جهة <span class="mono-ltr text-amber-300">N</span> يستقبل مفتاح جهة <span class="mono-ltr">1</span>:</p>
+              <div class="mono-ltr bg-slate-950 p-2 rounded border border-slate-700 text-sky-300 space-y-1">
+                <div>&bull; EMPLOYEE takes <span class="text-amber-400">DNO</span> &rarr; DEPARTMENT.DNUMBER</div>
+                <div>&bull; EMPLOYEE takes <span class="text-amber-400">SUPERSSN</span> &rarr; EMPLOYEE.SSN</div>
+                <div>&bull; PROJECT takes <span class="text-amber-400">DNUM</span> &rarr; DEPARTMENT.DNUMBER</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "mapping_step5_6") {
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-900 p-3.5 rounded-xl border border-indigo-500/40">
+              <div class="font-bold text-indigo-400 mb-1">الخطوة 5 (علاقة M:N Works-on &rarr; جدول جديد):</div>
+              <div class="mono-ltr bg-slate-950 p-2.5 rounded border border-slate-700 text-slate-200 mb-1.5">
+                WORKS_ON ( <span class="underline font-bold text-emerald-400">ESSN, PNO</span>, HOURS )
+              </div>
+              <p class="text-slate-300">المفتاح الأساسي مركب من المفتاحين الأجنبيين <span class="mono-ltr">(ESSN, PNO)</span> وصفة العلاقة <span class="mono-ltr">HOURS</span> عمود عادي.</p>
+            </div>
+            <div class="bg-slate-900 p-3.5 rounded-xl border border-pink-500/40">
+              <div class="font-bold text-pink-400 mb-1">الخطوة 6 (صفة متعددة القيم Location &rarr; جدول جديد):</div>
+              <div class="mono-ltr bg-slate-950 p-2.5 rounded border border-slate-700 text-slate-200 mb-1.5">
+                DEPT_LOCATIONS ( <span class="underline font-bold text-pink-400">DNUMBER, DLOCATION</span> )
+              </div>
+              <p class="text-slate-300">المفتاح الأساسي مركب من المفتاح الأجنبي للقسم <span class="mono-ltr">DNUMBER</span> + قيمة الموقع <span class="mono-ltr">DLOCATION</span>.</p>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "schema_interactive") {
+        const fks = [
+          { label: "1. employee.dno &rarr; department.dnumber", desc: "كل موظف يتبع لقسم واحد (من علاقة Works-For 1:N)." },
+          { label: "2. employee.superssn &rarr; employee.ssn", desc: "الإشراف الذاتي: موظف يشرف على موظفين داخل نفس جدول EMPLOYEE." },
+          { label: "3. department.mgrssn &rarr; employee.ssn", desc: "مدير القسم هو موظف (من علاقة Manage 1:1 — يؤجل في pgAdmin لبعد إدخال الموظفين)." },
+          { label: "4. dept_locations.dnumber &rarr; department.dnumber", desc: "القسم يملك عدة مواقع (من تحويل الصفة متعددة القيم)." },
+          { label: "5. project.dnum &rarr; department.dnumber", desc: "القسم يسيطر ويشرف على عدة مشاريع (من علاقة Control 1:N)." },
+          { label: "6. works_on.essn &rarr; employee.ssn", desc: "الطرف الأول من جدول علاقة M:N بين الموظف والمشروع." },
+          { label: "7. works_on.pno &rarr; project.pnumber", desc: "الطرف الثاني من جدول علاقة M:N بين الموظف والمشروع." },
+          { label: "8. dependent.essn &rarr; employee.ssn", desc: "ربط الكيان الضعيف DEPENDENT بالكيان المالك EMPLOYEE." }
+        ];
+        const cur = fks[state.schemaFkIdx] || fks[0];
+        return `
+          <div class="space-y-3">
+            <div class="text-xs text-slate-300">انقر على أي مفتاح أجنبي من المفاتيح الثمانية لمعرفة مساره ومعناه:</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              ${fks.map((f, i) => `
+                <button onclick="setSchemaFk(${i})" class="text-left mono-ltr px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${state.schemaFkIdx === i ? 'bg-sky-600 text-white border-sky-400' : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'}">${f.label}</button>
+              `).join("")}
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-sky-500/40 text-xs md:text-sm text-sky-200">
+              🎯 <strong>الشرح:</strong> ${cur.desc}
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "datatype_matcher") {
+        return `
+          <div class="overflow-x-auto text-xs">
+            <table class="w-full text-right border-collapse">
+              <thead>
+                <tr class="bg-slate-800 text-sky-300">
+                  <th class="p-2 border border-slate-700">النوع في SQL Server</th>
+                  <th class="p-2 border border-slate-700">النوع المقابل في PostgreSQL / pgAdmin</th>
+                  <th class="p-2 border border-slate-700">الأعمدة في COMPANY</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800 bg-slate-900">
+                <tr><td class="p-2 border border-slate-800 mono-ltr">int</td><td class="p-2 border border-slate-800 mono-ltr text-emerald-400">integer</td><td class="p-2 border border-slate-800 mono-ltr">dnumber, pnumber, dno, dnum, pno</td></tr>
+                <tr><td class="p-2 border border-slate-800 mono-ltr">varchar(30)</td><td class="p-2 border border-slate-800 mono-ltr text-emerald-400">character varying (Length=30)</td><td class="p-2 border border-slate-800 mono-ltr">fname, lname, dname, relationship</td></tr>
+                <tr><td class="p-2 border border-slate-800 mono-ltr">char(9) / varchar(9)</td><td class="p-2 border border-slate-800 mono-ltr text-amber-400">character varying(9)</td><td class="p-2 border border-slate-800 mono-ltr">ssn, mgrssn, superssn, essn</td></tr>
+                <tr><td class="p-2 border border-slate-800 mono-ltr">decimal(p,s)</td><td class="p-2 border border-slate-800 mono-ltr text-emerald-400">numeric (Precision=p, Scale=s)</td><td class="p-2 border border-slate-800 mono-ltr">salary(10,2), hours(4,1)</td></tr>
+                <tr><td class="p-2 border border-slate-800 mono-ltr">datetime / bit</td><td class="p-2 border border-slate-800 mono-ltr text-emerald-400">timestamp without time zone / boolean</td><td class="p-2 border border-slate-800">للتاريخ والوقت / للقيم المنطقية</td></tr>
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      if (type === "pgadmin_workflow") {
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2.5 text-xs">
+            <div class="bg-slate-900 p-3 rounded-xl border border-sky-500/40">
+              <div class="font-black text-sky-400 mb-1">المرحلة 1: DEPARTMENT</div>
+              <p class="text-slate-300">أنشئ الجدول واجعل <span class="mono-ltr">mgrssn</span> يقبل <span class="mono-ltr">NULL</span> مؤقتاً وبلا <span class="mono-ltr">FK</span>، وأدخل الأقسام (5، 4، 1).</p>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-emerald-500/40">
+              <div class="font-black text-emerald-400 mb-1">المرحلة 2: EMPLOYEE</div>
+              <p class="text-slate-300">أدخل <span class="mono-ltr text-amber-300">James</span> أولاً (لأن مشرفه <span class="mono-ltr">[null]</span>) ثم <span class="mono-ltr">Franklin</span> و <span class="mono-ltr">Jennifer</span> ثم الباقين.</p>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-amber-500/40">
+              <div class="font-black text-amber-400 mb-1">المرحلة 3: إكمال المدير</div>
+              <p class="text-slate-300">حدث <span class="mono-ltr">mgrssn</span> في <span class="mono-ltr">department</span> ثم أنشئ قيد <span class="mono-ltr">FK</span> وفعّل <span class="mono-ltr">Not NULL = Yes</span>.</p>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-indigo-500/40">
+              <div class="font-black text-indigo-400 mb-1">المرحلة 4: بقية الجداول</div>
+              <p class="text-slate-300">أدخل <span class="mono-ltr">dept_locations</span> ثم <span class="mono-ltr">project</span> ثم <span class="mono-ltr">works_on</span> ثم <span class="mono-ltr">dependent</span>.</p>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "sql_categories_game") {
+        return `
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 text-xs text-center">
+            <div class="bg-slate-900 p-3 rounded-xl border border-sky-500/40">
+              <div class="text-base font-black text-sky-400 mono-ltr">DQL</div>
+              <div class="text-[11px] text-slate-400 mb-1">Data Query Language</div>
+              <div class="mono-ltr font-bold text-white bg-slate-950 py-1 rounded">SELECT</div>
+              <div class="mt-1 text-slate-300">استعادة البيانات</div>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-emerald-500/40">
+              <div class="text-base font-black text-emerald-400 mono-ltr">DML</div>
+              <div class="text-[11px] text-slate-400 mb-1">Data Manipulation</div>
+              <div class="mono-ltr font-bold text-white bg-slate-950 py-1 rounded">INSERT, UPDATE, DELETE</div>
+              <div class="mt-1 text-slate-300">التعديل على البيانات</div>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-amber-500/40">
+              <div class="text-base font-black text-amber-400 mono-ltr">DDL</div>
+              <div class="text-[11px] text-slate-400 mb-1">Data Definition</div>
+              <div class="mono-ltr font-bold text-white bg-slate-950 py-1 rounded">CREATE, ALTER, DROP, TRUNCATE</div>
+              <div class="mt-1 text-slate-300">بنية قاعدة البيانات</div>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-purple-500/40">
+              <div class="text-base font-black text-purple-400 mono-ltr">DCL</div>
+              <div class="text-[11px] text-slate-400 mb-1">Data Control</div>
+              <div class="mono-ltr font-bold text-white bg-slate-950 py-1 rounded">GRANT, REVOKE</div>
+              <div class="mt-1 text-slate-300">منح وسحب السماحيات</div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "select_modifiers_demo") {
+        return `
+          <div class="space-y-2 text-xs">
+            <div class="mono-ltr bg-slate-900 p-3 rounded-xl border border-slate-800 text-emerald-300">
+              <div><span class="text-sky-400">-- الاستعلام 4 و 5: الدمج والعمليات الحسابية والاسم المستعار</span></div>
+              <div>select fname+' '+minit+' '+lname [full name], salary as [befor salary], salary+500 as [new salary] from EMPLOYEE</div>
+              <div class="mt-2"><span class="text-sky-400">-- الاستعلام 6 و 8: منع التكرار ونسبة السجلات</span></div>
+              <div>select distinct Essn from WORKS_ON</div>
+              <div>select top 50 percent * from EMPLOYEE</div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "where_evaluator") {
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
+              <div class="font-bold text-amber-400 mb-1">إيجاد مدير الشركة (الاستعلام 14):</div>
+              <div class="mono-ltr bg-slate-950 p-2 rounded text-emerald-300 mb-1">select fname+' '+lname [manger name] from EMPLOYEE where superssn is null</div>
+              <p class="text-slate-300">النتيجة: <span class="mono-ltr text-white font-bold">James Borg</span> (لأنه الوحيد الذي لا يملك مشرفاً).</p>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
+              <div class="font-bold text-sky-400 mb-1">أعلى راتب في القسم الأول (الاستعلام 15):</div>
+              <div class="mono-ltr bg-slate-950 p-2 rounded text-emerald-300 mb-1">select top(1) * from EMPLOYEE where dno=1 order by salary desc</div>
+              <p class="text-slate-300">يرتب موظفي القسم 1 تنازلياً حسب الراتب ويأخذ أول سجل.</p>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "like_tester") {
+        const patterns = [
+          { pat: "h%", desc: "يبدأ بالحرف h (الاستعلام 16)", matches: ["Headquarters"] },
+          { pat: "[a-h]%", desc: "يبدأ بأي حرف من a إلى h (الاستعلام 17)", matches: ["Administration", "Headquarters"] },
+          { pat: "[^a-h]%", desc: "لا يبدأ بأي حرف من a إلى h (استثناء بـ ^)", matches: ["Research"] },
+          { pat: "_e%", desc: "الحرف الثاني هو e (باستخدام _ لمحرف واحد)", matches: ["Research", "Headquarters"] }
+        ];
+        const cur = patterns.find(p => p.pat === state.likePattern) || patterns[0];
+        return `
+          <div class="space-y-3 text-xs">
+            <div class="flex flex-wrap gap-1.5">
+              ${patterns.map(p => `
+                <button onclick="setLikeDemo('${p.pat}')" class="px-3 py-1 rounded-lg font-bold mono-ltr ${state.likePattern === p.pat ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300'}">LIKE '${p.pat}'</button>
+              `).join("")}
+            </div>
+            <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div class="mono-ltr text-emerald-300 font-bold mb-1">SELECT * FROM DEPARTMENT WHERE dname LIKE '${cur.pat}'</div>
+                <div class="text-slate-300">المعنى: <strong>${cur.desc}</strong></div>
+              </div>
+              <div class="flex gap-2">
+                ${cur.matches.map(m => `<span class="px-3 py-1 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-bold mono-ltr">${m}</span>`).join("")}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "groupby_visualizer") {
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+            <div class="bg-slate-900 p-3 rounded-xl border border-slate-800">
+              <div class="font-bold text-sky-400 mb-1">عدد الموظفين وأعلى راتب ومجموع الرواتب لكل قسم:</div>
+              <div class="mono-ltr bg-slate-950 p-2 rounded text-emerald-300 space-y-1">
+                <div>select dno, COUNT(*) as count, MAX(salary) as max, SUM(salary) as total</div>
+                <div>from EMPLOYEE group by dno order by max</div>
+              </div>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-xl border border-amber-500/30">
+              <div class="font-bold text-amber-400 mb-1">فلترة التجميع باستخدام HAVING:</div>
+              <div class="mono-ltr bg-slate-950 p-2 rounded text-amber-300 space-y-1">
+                <div>select COUNT(ssn) from EMPLOYEE</div>
+                <div>group by dno having AVG(salary) &gt; 20000</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (type === "functions_playground") {
+        const demos = {
+          substring: { code: "SELECT SUBSTRING('abcde', 3, 2)", out: "'cd'", note: "الترقيم يبدأ من 1: الحرف 3 هو 'c' وبطول حرفين (2) يعطي 'cd'." },
+          leftright: { code: "SELECT LEFT('abcdef', 2), RIGHT('abcd', 3)", out: "'ab'  |  'bcd'", note: "LEFT يقتطع 2 من اليسار، و RIGHT يقتطع 3 من اليمين." },
+          asciichar: { code: "SELECT CHAR(65), ASCII('a'), LOWER('ABC'), UPPER('abC')", out: "'A' | 97 | 'abc' | 'ABC'", note: "CHAR يعيد المحرف، ASCII يعيد الرقم، LOWER/UPPER لحالة الأحرف." },
+          datefunc: { code: "SELECT DAY('20000110'), MONTH('20001001'), YEAR('20001010')", out: "10  |  10  |  2000", note: "لاحظ كتابة التاريخ بين إشارتي تنصيص بلا فواصل 'YYYYMMDD'." },
+          isnull: { code: "SELECT ISNULL(address, 0) FROM EMPLOYEE", out: "يعيد العنوان أو 0 إذا كان NULL", note: "يفحص الوسيط الأول فإذا كان NULL يعيد الوسيط الثاني." }
+        };
+        const cur = demos[state.funcDemoType] || demos.substring;
+        return `
+          <div class="space-y-3 text-xs">
+            <div class="flex flex-wrap gap-1.5">
+              <button onclick="setFuncDemo('substring')" class="px-2.5 py-1 rounded-lg font-bold mono-ltr ${state.funcDemoType === 'substring' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300'}">SUBSTRING</button>
+              <button onclick="setFuncDemo('leftright')" class="px-2.5 py-1 rounded-lg font-bold mono-ltr ${state.funcDemoType === 'leftright' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300'}">LEFT / RIGHT</button>
+              <button onclick="setFuncDemo('asciichar')" class="px-2.5 py-1 rounded-lg font-bold mono-ltr ${state.funcDemoType === 'asciichar' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300'}">ASCII / CHAR / CASE</button>
+              <button onclick="setFuncDemo('datefunc')" class="px-2.5 py-1 rounded-lg font-bold mono-ltr ${state.funcDemoType === 'datefunc' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300'}">DAY / MONTH / YEAR</button>
+              <button onclick="setFuncDemo('isnull')" class="px-2.5 py-1 rounded-lg font-bold mono-ltr ${state.funcDemoType === 'isnull' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-300'}">ISNULL</button>
+            </div>
+            <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div class="mono-ltr text-emerald-300 font-bold text-sm mb-1">${cur.code}</div>
+                <div class="text-slate-300">${cur.note}</div>
+              </div>
+              <div class="px-4 py-2 rounded-xl bg-sky-500/20 border border-sky-500/40 text-sky-200 font-black mono-ltr text-sm">
+                النتيجة: ${cur.out}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      return "";
+    }
+
+    function setAttrDemo(idx) { state.attrDemoIdx = idx; renderCurrentStation(); }
+    function setRelDemo(card, part) { state.relDemoCard = card; state.relDemoPart = part; renderCurrentStation(); }
+    function setHwTab(tab) { state.hwTab = tab; renderCurrentStation(); }
+    function setSchemaFk(idx) { state.schemaFkIdx = idx; renderCurrentStation(); }
+    function setLikeDemo(pat) { state.likePattern = pat; renderCurrentStation(); }
+    function setFuncDemo(t) { state.funcDemoType = t; renderCurrentStation(); }
+
+    // ==================== TAB 2: SQL LAB FUNCTIONS ====================
+    function filterSqlExercises(cat) {
+      state.sqlFilter = cat;
+      ["all", "lec5", "lec6"].forEach(c => {
+        const b = document.getElementById("sql-filt-" + c);
+        if (b) {
+          b.className = (c === cat)
+            ? "px-3 py-1 rounded-lg text-xs font-bold bg-sky-600 text-white"
+            : "px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+        }
+      });
+      renderSqlLab();
+    }
+
+    function renderSqlLab() {
+      const listEl = document.getElementById("sql-exercise-list");
+      const filtered = SQL_EXERCISES.filter(ex => state.sqlFilter === "all" || ex.cat === state.sqlFilter);
+      listEl.innerHTML = filtered.map(ex => `
+        <button onclick="selectSqlExercise(${ex.id})" class="w-full text-right p-3 rounded-xl border transition-all ${state.activeSqlExId === ex.id ? 'bg-sky-600/20 border-sky-500 text-white' : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:bg-slate-800'}">
+          <div class="text-xs font-bold">${ex.title}</div>
+          <div class="text-[11px] mono-ltr text-sky-400 truncate mt-0.5">${ex.sql}</div>
+        </button>
+      `).join("");
+
+      const active = SQL_EXERCISES.find(e => e.id === state.activeSqlExId) || SQL_EXERCISES[0];
+      document.getElementById("sql-active-title").textContent = active.title;
+      document.getElementById("sql-editor-input").value = active.sql;
+      document.getElementById("sql-explanation-box").innerHTML = `💡 <strong>شرح الاستعلام:</strong> ${active.exp}`;
+      renderTableInto("sql-result-table", active.getRows(), "sql-row-count");
+      previewRefTable("EMPLOYEE");
+    }
+
+    function selectSqlExercise(id) {
+      state.activeSqlExId = id;
+      renderSqlLab();
+    }
+
+    function showSqlSolution() {
+      const active = SQL_EXERCISES.find(e => e.id === state.activeSqlExId) || SQL_EXERCISES[0];
+      document.getElementById("sql-editor-input").value = active.sql;
+      renderTableInto("sql-result-table", active.getRows(), "sql-row-count");
+      showToast("تم إدراج الحل النموذجي وتنفيذه!", "success");
+    }
+
+    function runCustomSql() {
+      const raw = (document.getElementById("sql-editor-input").value || "").trim().toLowerCase();
+      // Match against known exercises or table names
+      const matched = SQL_EXERCISES.find(e => e.sql.toLowerCase().replace(/\s+/g, " ") === raw.replace(/\s+/g, " "));
+      if (matched) {
+        renderTableInto("sql-result-table", matched.getRows(), "sql-row-count");
+        showToast("تم تنفيذ الاستعلام بنجاح! ✓", "success");
+        return;
+      }
+      if (raw.includes("from department")) {
+        renderTableInto("sql-result-table", COMPANY_DB.DEPARTMENT, "sql-row-count");
+      } else if (raw.includes("from project")) {
+        renderTableInto("sql-result-table", COMPANY_DB.PROJECT, "sql-row-count");
+      } else if (raw.includes("from works_on")) {
+        renderTableInto("sql-result-table", COMPANY_DB.WORKS_ON, "sql-row-count");
+      } else if (raw.includes("from dependent")) {
+        renderTableInto("sql-result-table", COMPANY_DB.DEPENDENT, "sql-row-count");
+      } else if (raw.includes("from dept_locations")) {
+        renderTableInto("sql-result-table", COMPANY_DB.DEPT_LOCATIONS, "sql-row-count");
+      } else {
+        const active = SQL_EXERCISES.find(e => e.id === state.activeSqlExId) || SQL_EXERCISES[0];
+        renderTableInto("sql-result-table", active.getRows(), "sql-row-count");
+      }
+      showToast("تم تنفيذ الاستعلام وعرض الجدول المؤقت!", "success");
+    }
+
+    function previewRefTable(tblName) {
+      const rows = COMPANY_DB[tblName] || [];
+      renderTableInto("ref-table-container", rows);
+    }
+
+    function renderTableInto(containerId, rows, countId) {
+      const el = document.getElementById(containerId);
+      if (countId) {
+        document.getElementById(countId).textContent = `عدد السجلات: ${rows.length}`;
+      }
+      if (!rows || rows.length === 0) {
+        el.innerHTML = `<div class="text-xs text-amber-300 p-3 bg-slate-950 rounded-lg border border-slate-800">النتيجة فارغة (0 سجل يطابق الشرط).</div>`;
+        return;
+      }
+      const cols = Object.keys(rows[0]);
+      const thead = cols.map(c => `<th class="px-2.5 py-1.5 bg-slate-800 text-sky-300 border border-slate-700 mono-ltr text-left text-xs">${c}</th>`).join("");
+      const tbody = rows.map(r => {
+        const tds = cols.map(c => `<td class="px-2.5 py-1.5 border border-slate-800 mono-ltr text-left text-xs text-slate-200">${r[c] === null ? '<span class="text-rose-400">[null]</span>' : r[c]}</td>`).join("");
+        return `<tr class="hover:bg-slate-800/60">${tds}</tr>`;
+      }).join("");
+      el.innerHTML = `<table class="w-full border-collapse">${thead ? `<thead><tr>${thead}</tr></thead>` : ''}<tbody>${tbody}</tbody></table>`;
+    }
+
+    // ==================== TAB 3: EXAM SIMULATOR ====================
+    function filterExam(lec) {
+      state.examFilter = lec;
+      ["all", 2, 3, 4, 5, 6].forEach(k => {
+        const b = document.getElementById("ex-filt-" + k);
+        if (b) {
+          b.className = (k === lec)
+            ? "px-3 py-1 rounded-lg text-xs font-bold bg-sky-600 text-white"
+            : "px-3 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+        }
+      });
+      renderExam();
+    }
+
+    function renderExam() {
+      const container = document.getElementById("exam-questions-container");
+      let correctCount = 0;
+      EXAM_QUESTIONS.forEach(q => {
+        if (state.examAnswers[q.id] === q.ans) correctCount++;
+      });
+      document.getElementById("exam-score-label").textContent = `${correctCount} / ${EXAM_QUESTIONS.length}`;
+
+      const list = EXAM_QUESTIONS.filter(q => state.examFilter === "all" || q.lec === state.examFilter);
+      container.innerHTML = list.map(q => {
+        const picked = state.examAnswers[q.id];
+        const optsHtml = q.opts.map((opt, oIdx) => {
+          let cls = "w-full text-right px-3.5 py-2.5 rounded-xl border text-xs md:text-sm font-semibold transition-all flex items-center justify-between ";
+          if (picked === undefined) cls += "bg-slate-900 border-slate-700 hover:border-sky-500 text-slate-200";
+          else if (oIdx === q.ans) cls += "bg-emerald-950/90 border-emerald-500 text-emerald-200 font-bold";
+          else if (picked === oIdx) cls += "bg-rose-950/90 border-rose-500 text-rose-200";
+          else cls += "bg-slate-900/40 border-slate-800 text-slate-500";
+          return `
+            <button onclick="answerExamQuestion(${q.id}, ${oIdx})" class="${cls}">
+              <span>${opt}</span>
+              <span>${picked !== undefined && oIdx === q.ans ? '✅' : picked === oIdx && oIdx !== q.ans ? '❌' : ''}</span>
+            </button>
+          `;
+        }).join("");
+
+        return `
+          <div class="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs md:text-sm font-bold text-white">سؤال ${q.id}: ${q.q}</span>
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-sky-400 text-[11px] font-bold shrink-0">المحاضرة ${q.lec}</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">${optsHtml}</div>
+            ${picked !== undefined ? `
+              <div class="text-xs p-2.5 rounded-lg border ${picked === q.ans ? 'bg-emerald-950/50 border-emerald-700 text-emerald-300' : 'bg-amber-950/50 border-amber-700 text-amber-300'}">
+                <strong>التعليل:</strong> ${q.exp}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function answerExamQuestion(qId, oIdx) {
+      const q = EXAM_QUESTIONS.find(x => x.id === qId);
+      if (state.examAnswers[qId] === undefined && oIdx === q.ans) {
+        state.xp += 15;
+      }
+      state.examAnswers[qId] = oIdx;
+      saveState();
+      updateHeaderProgress();
+      renderExam();
+    }
+
+    function resetExam() {
+      state.examAnswers = {};
+      saveState();
+      renderExam();
+      showToast("تمت إعادة ضبط الفحص التجريبي.", "warn");
+    }
+
+    function copyCodeBlock(id) {
+      const text = document.getElementById(id).innerText;
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+      showToast("تم نسخ الكود إلى الحافظة! 📋", "success");
+    }
+
+    // ==================== INITIALIZATION ====================
+    window.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      updateHeaderProgress();
+      renderSidebar();
+      renderCurrentStation();
+    });
+  </script>
+</body>
+</html>
